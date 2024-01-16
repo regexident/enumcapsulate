@@ -101,4 +101,30 @@ impl EnumDeriver {
             #(#impls)*
         })
     }
+
+    pub fn derive_into_variant(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.ident;
+        let variants = utils::infos_per_newtype_variant(&self.variants);
+
+        let impls = variants.into_iter().map(|variant_info| {
+            let VariantInfo {
+                ident: inner,
+                inner_ty,
+            } = variant_info;
+            quote! {
+                impl ::enumcapsulate::IntoVariant<#inner_ty> for #outer {
+                    fn into_variant(self) -> Result<#inner_ty, Self> {
+                        match self {
+                            #outer::#inner(variant) => Ok(variant),
+                            err => Err(err)
+                        }
+                    }
+                }
+            }
+        });
+
+        Ok(quote! {
+            #(#impls)*
+        })
+    }
 }
