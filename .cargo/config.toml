@@ -1,0 +1,3 @@
+[env]
+# https://github.com/rust-lang/cargo/issues/8430
+RUST_TEST_THREADS = "1"
