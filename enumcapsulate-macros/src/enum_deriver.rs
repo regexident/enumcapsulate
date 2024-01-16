@@ -25,3 +25,28 @@ impl TryFrom<DeriveInput> for EnumDeriver {
         Ok(Self { ident, variants })
     }
 }
+
+impl EnumDeriver {
+    pub fn derive_from_variant(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.ident;
+        let variants = utils::infos_per_newtype_variant(&self.variants);
+
+        let impls = variants.into_iter().map(|variant_info| {
+            let VariantInfo {
+                ident: inner,
+                inner_ty,
+            } = variant_info;
+            quote! {
+                impl ::enumcapsulate::FromVariant<#inner_ty> for #outer {
+                    fn from_variant(inner: #inner_ty) -> Self {
+                        Self::#inner(inner)
+                    }
+                }
+            }
+        });
+
+        Ok(quote! {
+            #(#impls)*
+        })
+    }
+}

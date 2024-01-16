@@ -1,0 +1,6 @@
+error: Only enums can use this derive
+ --> /tests/expand-macros/from_variant/fail/union.rs:4:11
+  |
+4 | pub union Union {
+  |           ^^^^^
+error: could not compile `<CRATE>` (bin "<BIN>") due to previous error
