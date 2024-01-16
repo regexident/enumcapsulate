@@ -41,6 +41,7 @@ where
         .collect::<Vec<VariantInfo>>()
 }
 
+#[track_caller]
 pub(crate) fn tokenstream<F>(f: F) -> TokenStream
 where
     F: FnOnce() -> Result<TokenStream2, syn::Error>,

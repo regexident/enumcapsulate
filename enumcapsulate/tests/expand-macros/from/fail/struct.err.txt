@@ -1,0 +1,6 @@
+error: Only enums can use this derive
+ --> /tests/expand-macros/from/fail/struct.rs:4:12
+  |
+4 | pub struct Struct {
+  |            ^^^^^^
+error: could not compile `<CRATE>` (bin "<BIN>") due to previous error
