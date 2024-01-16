@@ -12,6 +12,13 @@ pub trait FromVariant<T> {
 
 pub trait AsVariantRef<T> {
     fn as_variant_ref(&self) -> Option<&T>;
+
+    fn as_variant(&self) -> Option<T>
+    where
+        T: Clone,
+    {
+        self.as_variant_ref().cloned()
+    }
 }
 
 pub trait AsVariantMut<T> {
