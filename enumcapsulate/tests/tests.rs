@@ -3,6 +3,8 @@ pub fn pass() {
     tryexpand::expand_checking([
         // From
         "tests/expand-macros/from/pass/**/*.rs",
+        // TryInto
+        "tests/expand-macros/try_into/pass/**/*.rs",
         // FromVariant
         "tests/expand-macros/from_variant/pass/**/*.rs",
         // AsVariantRef
@@ -21,6 +23,8 @@ pub fn fail() {
     tryexpand::expand_fail([
         // From
         "tests/expand-macros/from/fail/**/*.rs",
+        // TryInto
+        "tests/expand-macros/try_into/fail/**/*.rs",
         // FromVariant
         "tests/expand-macros/from_variant/fail/**/*.rs",
         // AsVariantRef

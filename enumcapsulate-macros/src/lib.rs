@@ -18,6 +18,16 @@ pub fn derive_from(input: TokenStream) -> TokenStream {
     })
 }
 
+#[proc_macro_derive(TryInto)]
+pub fn derive_try_from(input: TokenStream) -> TokenStream {
+    let input: DeriveInput = parse_macro_input!(input);
+
+    tokenstream(|| {
+        let deriver = EnumDeriver::try_from(input)?;
+        deriver.derive_try_into()
+    })
+}
+
 #[proc_macro_derive(FromVariant)]
 pub fn derive_from_variant(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);

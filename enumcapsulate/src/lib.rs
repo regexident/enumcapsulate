@@ -3,7 +3,7 @@ pub use enumcapsulate_macros as macros;
 
 #[cfg(feature = "derive")]
 pub mod derive {
-    pub use super::macros::{AsVariantMut, AsVariantRef, From, FromVariant, IntoVariant};
+    pub use super::macros::{AsVariantMut, AsVariantRef, From, FromVariant, IntoVariant, TryInto};
 }
 
 pub trait FromVariant<T> {

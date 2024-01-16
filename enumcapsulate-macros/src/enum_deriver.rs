@@ -50,6 +50,34 @@ impl EnumDeriver {
         })
     }
 
+    pub fn derive_try_into(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.ident;
+        let variants = utils::infos_per_newtype_variant(&self.variants);
+
+        let impls = variants.into_iter().map(|variant_info| {
+            let VariantInfo {
+                ident: inner,
+                inner_ty,
+            } = variant_info;
+            quote! {
+                impl ::core::convert::TryFrom<#outer> for #inner_ty {
+                    type Error = #outer;
+
+                    fn try_from(outer: #outer) -> Result<Self, Self::Error> {
+                        match outer {
+                            #outer::#inner(inner) => Ok(inner),
+                            err => Err(err)
+                        }
+                    }
+                }
+            }
+        });
+
+        Ok(quote! {
+            #(#impls)*
+        })
+    }
+
     pub fn derive_from_variant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
         let variants = utils::infos_per_newtype_variant(&self.variants);
