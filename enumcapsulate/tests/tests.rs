@@ -5,6 +5,8 @@ pub fn pass() {
         "tests/expand-macros/from_variant/pass/**/*.rs",
         // AsVariantRef
         "tests/expand-macros/as_variant_ref/pass/**/*.rs",
+        // AsVariantMut
+        "tests/expand-macros/as_variant_mut/pass/**/*.rs",
     ]);
 }
 
@@ -15,5 +17,7 @@ pub fn fail() {
         "tests/expand-macros/from_variant/fail/**/*.rs",
         // AsVariantRef
         "tests/expand-macros/as_variant_ref/fail/**/*.rs",
+        // AsVariantMut
+        "tests/expand-macros/as_variant_mut/fail/**/*.rs",
     ]);
 }

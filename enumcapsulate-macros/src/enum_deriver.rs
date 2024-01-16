@@ -75,4 +75,30 @@ impl EnumDeriver {
             #(#impls)*
         })
     }
+
+    pub fn derive_as_variant_mut(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.ident;
+        let variants = utils::infos_per_newtype_variant(&self.variants);
+
+        let impls = variants.into_iter().map(|variant_info| {
+            let VariantInfo {
+                ident: inner,
+                inner_ty,
+            } = variant_info;
+            quote! {
+                impl ::enumcapsulate::AsVariantMut<#inner_ty> for #outer {
+                    fn as_variant_mut(&mut self) -> Option<&mut #inner_ty> {
+                        match self {
+                            #outer::#inner(variant) => Some(variant),
+                            _ => None
+                        }
+                    }
+                }
+            }
+        });
+
+        Ok(quote! {
+            #(#impls)*
+        })
+    }
 }
