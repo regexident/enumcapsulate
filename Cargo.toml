@@ -1,5 +1,5 @@
 [workspace]
-members = ["enumcapsulate"]
+members = ["enumcapsulate", "enumcapsulate-macros"]
 resolver = "2"
 
 [workspace.package]
