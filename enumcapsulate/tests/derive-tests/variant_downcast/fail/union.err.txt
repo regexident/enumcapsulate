@@ -1,0 +1,5 @@
+error: Only enums can use this derive
+ --> /tests/derive-tests/variant_downcast/fail/union.rs:4:11
+  |
+4 | pub union Union {
+  |           ^^^^^

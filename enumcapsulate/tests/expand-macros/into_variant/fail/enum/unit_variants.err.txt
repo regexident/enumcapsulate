@@ -1,8 +1,0 @@
-error: proc-macro derive panicked
- --> /tests/expand-macros/into_variant/fail/enum/unit_variants.rs:5:10
-  |
-5 | #[derive(IntoVariant)]
-  |          ^^^^^^^^^^^
-  |
-  = help: message: called `Result::unwrap()` on an `Err` value: Error("Only enums with tuple variants can use this derive")
-error: could not compile `<CRATE>` (bin "<BIN>") due to previous error

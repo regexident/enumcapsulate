@@ -1,0 +1,5 @@
+error: Only enums can use this derive
+ --> /tests/derive-tests/into_variant/fail/struct.rs:4:12
+  |
+4 | pub struct Struct {
+  |            ^^^^^^
