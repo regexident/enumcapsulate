@@ -3,6 +3,9 @@ members = ["macros"]
 resolver = "2"
 
 [workspace.package]
+repository = "https://github.com/regexident/enumcapsulate"
+homepage = "https://github.com/regexident/enumcapsulate"
+documentation = "https://docs.rs/enumcapsulate"
 license = "MPL-2.0"
 edition = "2021"
 rust-version = "1.70.0"
@@ -11,11 +14,13 @@ version = "0.1.0"
 [package]
 name = "enumcapsulate"
 description = "Safe casting for newtype enums and their variants"
-repository = "https://github.com/regexident/enumcapsulate"
 keywords = ["enum", "variant", "cast", "encapsulation"]
 categories = ["rust-patterns"]
 readme = "README.md"
 
+repository = { workspace = true }
+documentation = { workspace = true }
+homepage = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
 rust-version = { workspace = true }
