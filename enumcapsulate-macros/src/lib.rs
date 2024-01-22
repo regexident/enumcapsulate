@@ -22,6 +22,8 @@ mod utils;
 ///     // ...
 /// }
 ///
+/// // The generated impls look something along these lines:
+///
 /// impl From<Inner> for Outer {
 ///     fn from(inner: Inner) -> Self {
 ///         Outer::Inner(inner)
@@ -54,6 +56,8 @@ pub fn derive_from(input: TokenStream) -> TokenStream {
 ///     Inner(Inner),
 ///     // ...
 /// }
+///
+/// // The generated impls look something along these lines:
 ///
 /// impl TryFrom<Outer> for Inner {
 ///     type Error = Outer;
@@ -99,6 +103,8 @@ pub fn derive_try_from(input: TokenStream) -> TokenStream {
 ///     // ...
 /// }
 ///
+/// // The generated impls look something along these lines:
+///
 /// impl FromVariant<Inner> for Outer {
 ///     fn from_variant(inner: Inner) -> Self {
 ///         Outer::Inner(inner)
@@ -133,6 +139,8 @@ pub fn derive_from_variant(input: TokenStream) -> TokenStream {
 ///     Inner(Inner),
 ///     // ...
 /// }
+///
+/// // The generated impls look something along these lines:
 ///
 /// impl AsVariantRef<Inner> for Outer {
 ///     fn as_variant_ref(&self) -> Option<&Inner> {
@@ -172,6 +180,8 @@ pub fn derive_as_variant_ref(input: TokenStream) -> TokenStream {
 ///     // ...
 /// }
 ///
+/// // The generated impls look something along these lines:
+///
 /// impl AsVariantMut<Inner> for Outer {
 ///     fn as_variant_mut(&mut self) -> Option<&mut Inner> {
 ///         match self {
@@ -210,6 +220,8 @@ pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
 ///     Inner(Inner),
 ///     // ...
 /// }
+///
+/// // The generated impls look something along these lines:
 ///
 /// impl AsVariant<Inner> for Outer {
 ///     fn as_variant(&self) -> Option<Inner> {
@@ -255,6 +267,8 @@ pub fn derive_as_variant(input: TokenStream) -> TokenStream {
 ///     Inner(Inner),
 ///     // ...
 /// }
+///
+/// // The generated impls look something along these lines:
 ///
 /// impl IntoVariant<Inner> for Outer {
 ///     fn into_variant(self) -> Result<T, Self> {
@@ -309,6 +323,8 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
 
 /// Derive macro generating an impl of the trait `IsVariant`.
 ///
+/// The generated impl looks something along these lines:
+///
 /// ```
 /// struct Inner;
 ///
@@ -316,6 +332,8 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
 ///     Inner(Inner),
 ///     // ...
 /// }
+///
+/// // The generated impls look something along these lines:
 ///
 /// impl IsVariant for Outer {
 ///     fn is_variant<T>(&self) -> bool
@@ -359,6 +377,8 @@ pub fn derive_is_variant(input: TokenStream) -> TokenStream {
 ///     Inner,
 ///     // ...
 /// }
+///
+/// // The generated impl looks something along these lines:
 ///
 /// impl VariantDiscriminant for Outer {
 ///     type Discriminant = OuterDiscriminant;
