@@ -17,7 +17,7 @@ version = { workspace = true }
 enumcapsulate-macros = { path = "../enumcapsulate-macros", optional = true }
 
 [dev-dependencies]
-tryexpand = "0.6.0"
+tryexpand = "0.7.0"
 
 [features]
 default = ["derive"]
