@@ -94,3 +94,29 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
         deriver.derive_variant_downcast()
     })
 }
+#[proc_macro_derive(Encapsulate)]
+pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
+    let input: DeriveInput = parse_macro_input!(input);
+
+    tokenstream(|| {
+        let deriver = EnumDeriver::try_from(input)?;
+
+        let from = deriver.derive_from()?;
+        let try_into = deriver.derive_try_into()?;
+        let from_variant = deriver.derive_from_variant()?;
+        let as_variant_ref = deriver.derive_as_variant_ref()?;
+        let as_variant_mut = deriver.derive_as_variant_mut()?;
+        let into_variant = deriver.derive_into_variant()?;
+        let variant_downcast = deriver.derive_variant_downcast()?;
+
+        Ok(quote::quote! {
+            #from
+            #try_into
+            #from_variant
+            #as_variant_ref
+            #as_variant_mut
+            #into_variant
+            #variant_downcast
+        })
+    })
+}

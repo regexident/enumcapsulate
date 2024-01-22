@@ -4,7 +4,7 @@ pub use enumcapsulate_macros as macros;
 #[cfg(feature = "derive")]
 pub mod derive {
     pub use super::macros::{
-        AsVariant, AsVariantMut, AsVariantRef, From, FromVariant, IntoVariant, TryInto,
+        AsVariant, AsVariantMut, AsVariantRef, Encapsulate, From, FromVariant, IntoVariant, TryInto,
     };
 }
 

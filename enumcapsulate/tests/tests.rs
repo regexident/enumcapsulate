@@ -17,6 +17,8 @@ pub fn pass() {
         "tests/expand-macros/into_variant/pass/**/*.rs",
         // VariantDowncast
         "tests/expand-macros/variant_downcast/pass/**/*.rs",
+        // Encapsulate
+        "tests/expand-macros/encapsulate/pass/**/*.rs",
     ]);
 }
 
