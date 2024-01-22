@@ -9,6 +9,8 @@ pub fn pass() {
         "tests/expand-macros/as_variant_mut/pass/**/*.rs",
         // IntoVariant
         "tests/expand-macros/into_variant/pass/**/*.rs",
+        // VariantDowncast
+        "tests/expand-macros/variant_downcast/pass/**/*.rs",
     ]);
 }
 
@@ -23,5 +25,7 @@ pub fn fail() {
         "tests/expand-macros/as_variant_mut/fail/**/*.rs",
         // IntoVariant
         "tests/expand-macros/into_variant/fail/**/*.rs",
+        // VariantDowncast
+        "tests/expand-macros/variant_downcast/fail/**/*.rs",
     ]);
 }

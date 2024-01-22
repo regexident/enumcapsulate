@@ -1,0 +1,17 @@
+error[E0432]: unresolved import `enumcapsulate::derive::AsVariant`
+ --> /tests/expand-macros/variant_downcast/fail/enum/unit_variants.rs:1:5
+  |
+1 | use enumcapsulate::derive::AsVariant;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^---------
+  |     |                      |
+  |     |                      help: a similar name exists in the module: `AsVariantMut`
+  |     no `AsVariant` in `derive`
+error: cannot determine resolution for the derive macro `AsVariant`
+ --> /tests/expand-macros/variant_downcast/fail/enum/unit_variants.rs:5:10
+  |
+5 | #[derive(AsVariant)]
+  |          ^^^^^^^^^
+  |
+  = note: import resolution is stuck, try simplifying macro imports
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `<CRATE>` (bin "<BIN>") due to 2 previous errors

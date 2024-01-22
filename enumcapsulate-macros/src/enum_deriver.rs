@@ -127,4 +127,14 @@ impl EnumDeriver {
             #(#impls)*
         })
     }
+
+    pub fn derive_variant_downcast(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.ident;
+
+        let tokens = quote! {
+            impl ::enumcapsulate::VariantDowncast for #outer {}
+        };
+
+        Ok(tokens)
+    }
 }
