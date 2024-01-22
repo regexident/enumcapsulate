@@ -58,6 +58,23 @@ pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
     })
 }
 
+#[proc_macro_derive(AsVariant)]
+pub fn derive_as_variant(input: TokenStream) -> TokenStream {
+    let input: DeriveInput = parse_macro_input!(input);
+
+    tokenstream(|| {
+        let deriver = EnumDeriver::try_from(input)?;
+
+        let as_variant_ref = deriver.derive_as_variant_ref()?;
+        let as_variant_mut = deriver.derive_as_variant_mut()?;
+
+        Ok(quote::quote! {
+            #as_variant_ref
+            #as_variant_mut
+        })
+    })
+}
+
 #[proc_macro_derive(IntoVariant)]
 pub fn derive_into_variant(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);

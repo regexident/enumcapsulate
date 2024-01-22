@@ -11,6 +11,8 @@ pub fn pass() {
         "tests/expand-macros/as_variant_ref/pass/**/*.rs",
         // AsVariantMut
         "tests/expand-macros/as_variant_mut/pass/**/*.rs",
+        // AsVariant
+        "tests/expand-macros/as_variant/pass/**/*.rs",
         // IntoVariant
         "tests/expand-macros/into_variant/pass/**/*.rs",
         // VariantDowncast
