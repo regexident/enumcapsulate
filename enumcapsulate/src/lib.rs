@@ -8,7 +8,8 @@ pub use enumcapsulate_macros as macros;
 #[cfg(feature = "derive")]
 pub mod derive {
     pub use super::macros::{
-        AsVariant, AsVariantMut, AsVariantRef, Encapsulate, From, FromVariant, IntoVariant, TryInto,
+        AsVariant, AsVariantMut, AsVariantRef, Encapsulate, From, FromVariant, IntoVariant,
+        IsVariant, TryInto,
     };
 }
 
@@ -89,4 +90,12 @@ pub trait VariantDowncast {
     {
         self.into_variant()
     }
+}
+
+/// Used to check type of an enum's inner variant's type.
+pub trait IsVariant {
+    /// Returns `true` if `T` matches the variant's type, otherwise `false`.
+    fn is_variant<T>(&self) -> bool
+    where
+        T: 'static + ?Sized;
 }

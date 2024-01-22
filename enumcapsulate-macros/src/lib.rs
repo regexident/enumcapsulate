@@ -307,6 +307,41 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
     })
 }
 
+/// Derive macro generating an impl of the trait `IsVariant`.
+///
+/// ```
+/// struct Inner;
+///
+/// enum Outer {
+///     Inner(Inner),
+///     // ...
+/// }
+///
+/// impl IsVariant for Outer {
+///     fn is_variant<T>(&self) -> bool
+///     where
+///         T: 'static + ?Sized
+///     {
+///         match self {
+///            Outer::Inner(inner) => /* ... */,
+///            // ...
+///        }
+///     }
+/// }
+///
+/// // ...
+/// ```
+///
+#[proc_macro_derive(IsVariant)]
+pub fn derive_is_variant(input: TokenStream) -> TokenStream {
+    let input: DeriveInput = parse_macro_input!(input);
+
+    tokenstream(|| {
+        let deriver = EnumDeriver::try_from(input)?;
+        deriver.derive_is_variant()
+    })
+}
+
 /// Umbrella derive macro.
 ///
 /// `#[derive(Encapsulate)` is equivalent to the following:
@@ -314,13 +349,13 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
 /// ```
 /// # use enumcapsulate::{
 /// #     derive::{
-/// #         From, TryInto, FromVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast
+/// #         From, TryInto, FromVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast, IsVariant
 /// #     },
 /// # };
 ///
 /// struct Inner;
 ///
-/// #[derive(From, TryInto, FromVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast)]
+/// #[derive(From, TryInto, FromVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast, IsVariant)]
 /// enum Outer {
 ///     Inner(Inner),
 ///     // ...
@@ -340,6 +375,7 @@ pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
         let as_variant_mut = deriver.derive_as_variant_mut()?;
         let into_variant = deriver.derive_into_variant()?;
         let variant_downcast = deriver.derive_variant_downcast()?;
+        let is_variant = deriver.derive_is_variant()?;
 
         Ok(quote::quote! {
             #from
@@ -349,6 +385,7 @@ pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
             #as_variant_mut
             #into_variant
             #variant_downcast
+            #is_variant
         })
     })
 }

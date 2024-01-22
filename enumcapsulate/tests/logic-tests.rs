@@ -168,3 +168,18 @@ mod as_variant {
         assert_eq!(option, None);
     }
 }
+
+#[test]
+fn is_variant() {
+    use enumcapsulate::IsVariant;
+    use enumcapsulate_macros::IsVariant;
+
+    #[derive(PartialEq, Debug, IsVariant)]
+    enum Enum {
+        VariantA(VariantA),
+        VariantB(VariantB),
+    }
+
+    assert_eq!(Enum::VariantA(VariantA).is_variant::<VariantA>(), true);
+    assert_eq!(Enum::VariantB(VariantB).is_variant::<VariantA>(), false);
+}

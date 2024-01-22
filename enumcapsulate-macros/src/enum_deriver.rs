@@ -188,4 +188,55 @@ impl EnumDeriver {
 
         Ok(tokens)
     }
+
+    pub fn derive_is_variant(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.ident;
+        let variants = utils::infos_per_newtype_variant(&self.variants);
+
+        let match_arms: Vec<_> = variants
+            .into_iter()
+            .map(|variant_info| {
+                let VariantInfo {
+                    ident: inner,
+                    inner_ty: _,
+                } = variant_info;
+
+                quote! {
+                    #outer::#inner(variant) => type_id_of_val(variant) == type_id,
+                }
+            })
+            .collect();
+
+        let method_body = if match_arms.is_empty() {
+            quote! {
+                unreachable!()
+            }
+        } else {
+            quote! {
+                use ::std::any::TypeId;
+
+                #[inline]
+                pub fn type_id_of_val<T: 'static + ?Sized>(_val: &T) -> TypeId {
+                    TypeId::of::<T>()
+                }
+
+                let type_id = TypeId::of::<T>();
+
+                match self {
+                    #(#match_arms)*
+                }
+            }
+        };
+
+        Ok(quote! {
+            impl ::enumcapsulate::IsVariant for #outer {
+                fn is_variant<T>(&self) -> bool
+                where
+                    T: 'static + ?Sized
+                {
+                    #method_body
+                }
+            }
+        })
+    }
 }

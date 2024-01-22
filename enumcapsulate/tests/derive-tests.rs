@@ -98,6 +98,13 @@ mod variant_downcast {
     }
 }
 
+mod is_variant {
+    #[test]
+    pub fn pass() {
+        tryexpand::expand(["tests/derive-tests/is_variant/pass/**/*.rs"]).and_check();
+    }
+}
+
 mod encapsulate {
     #[test]
     pub fn pass() {
