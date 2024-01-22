@@ -183,3 +183,24 @@ fn is_variant() {
     assert_eq!(Enum::VariantA(VariantA).is_variant::<VariantA>(), true);
     assert_eq!(Enum::VariantB(VariantB).is_variant::<VariantA>(), false);
 }
+
+#[test]
+fn variant_discriminant() {
+    use enumcapsulate::VariantDiscriminant;
+    use enumcapsulate_macros::VariantDiscriminant;
+
+    #[derive(PartialEq, Debug, VariantDiscriminant)]
+    enum Enum {
+        VariantA(VariantA),
+        VariantB(VariantB),
+    }
+
+    assert_eq!(
+        Enum::VariantA(VariantA).variant_discriminant(),
+        EnumDiscriminant::VariantA
+    );
+    assert_eq!(
+        Enum::VariantB(VariantB).variant_discriminant(),
+        EnumDiscriminant::VariantB
+    );
+}

@@ -105,6 +105,13 @@ mod is_variant {
     }
 }
 
+mod variant_discriminant {
+    #[test]
+    pub fn pass() {
+        tryexpand::expand(["tests/derive-tests/variant_discriminant/pass/**/*.rs"]).and_check();
+    }
+}
+
 mod encapsulate {
     #[test]
     pub fn pass() {

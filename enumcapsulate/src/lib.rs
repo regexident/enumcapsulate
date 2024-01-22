@@ -9,7 +9,7 @@ pub use enumcapsulate_macros as macros;
 pub mod derive {
     pub use super::macros::{
         AsVariant, AsVariantMut, AsVariantRef, Encapsulate, From, FromVariant, IntoVariant,
-        IsVariant, TryInto,
+        IsVariant, TryInto, VariantDiscriminant,
     };
 }
 
@@ -98,4 +98,12 @@ pub trait IsVariant {
     fn is_variant<T>(&self) -> bool
     where
         T: 'static + ?Sized;
+}
+
+/// Used to obtain an enum variant's discriminant.
+pub trait VariantDiscriminant {
+    type Discriminant: Eq;
+
+    /// Returns the variant's discriminant.
+    fn variant_discriminant(&self) -> Self::Discriminant;
 }

@@ -239,4 +239,67 @@ impl EnumDeriver {
             }
         })
     }
+
+    pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.ident;
+        let variants = utils::infos_per_newtype_variant(&self.variants);
+
+        let discriminant_ident = quote::format_ident!("{outer}Discriminant");
+
+        let discriminant_variants = variants.iter().map(|variant_info| {
+            let VariantInfo {
+                ident: inner,
+                inner_ty: _,
+            } = variant_info;
+
+            quote! {
+                #inner
+            }
+        });
+
+        let discriminant_enum = quote! {
+            #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+            pub enum #discriminant_ident {
+                #(#discriminant_variants),*
+            }
+        };
+
+        let match_arms: Vec<_> = variants
+            .into_iter()
+            .map(|variant_info| {
+                let VariantInfo {
+                    ident: inner,
+                    inner_ty: _,
+                } = variant_info;
+
+                quote! {
+                    #outer::#inner(_) => #discriminant_ident::#inner,
+                }
+            })
+            .collect();
+
+        let method_body = if match_arms.is_empty() {
+            quote! {
+                unreachable!()
+            }
+        } else {
+            quote! {
+                match self {
+                    #(#match_arms)*
+                }
+            }
+        };
+
+        Ok(quote! {
+            #discriminant_enum
+
+            impl ::enumcapsulate::VariantDiscriminant for #outer {
+                type Discriminant = #discriminant_ident;
+
+                fn variant_discriminant(&self) -> Self::Discriminant {
+                    #method_body
+                }
+            }
+        })
+    }
 }

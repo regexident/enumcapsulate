@@ -1,17 +1,15 @@
-use enumcapsulate::{
-    derive::Encapsulate, AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast,
-};
-pub enum Enum {}
-impl ::enumcapsulate::VariantDowncast for Enum {}
-impl ::enumcapsulate::IsVariant for Enum {
-    fn is_variant<T>(&self) -> bool
-    where
-        T: 'static + ?Sized,
-    {
-        ::core::panicking::panic("internal error: entered unreachable code")
-    }
+use enumcapsulate::derive::VariantDiscriminant;
+use enumcapsulate::VariantDiscriminant;
+pub struct VariantA;
+pub struct VariantB;
+pub enum Enum {
+    VariantA(VariantA),
+    VariantB(VariantB),
 }
-pub enum EnumDiscriminant {}
+pub enum EnumDiscriminant {
+    VariantA,
+    VariantB,
+}
 #[automatically_derived]
 impl ::core::marker::Copy for EnumDiscriminant {}
 #[automatically_derived]
@@ -36,33 +34,46 @@ impl ::core::marker::StructuralPartialEq for EnumDiscriminant {}
 impl ::core::cmp::PartialEq for EnumDiscriminant {
     #[inline]
     fn eq(&self, other: &EnumDiscriminant) -> bool {
-        match *self {}
+        let __self_tag = ::core::intrinsics::discriminant_value(self);
+        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
+        __self_tag == __arg1_tag
     }
 }
 #[automatically_derived]
 impl ::core::hash::Hash for EnumDiscriminant {
     #[inline]
     fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {
-        match *self {}
+        let __self_tag = ::core::intrinsics::discriminant_value(self);
+        ::core::hash::Hash::hash(&__self_tag, state)
     }
 }
 #[automatically_derived]
 impl ::core::fmt::Debug for EnumDiscriminant {
     #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-        match *self {}
+        ::core::fmt::Formatter::write_str(
+            f,
+            match self {
+                EnumDiscriminant::VariantA => "VariantA",
+                EnumDiscriminant::VariantB => "VariantB",
+            },
+        )
     }
 }
 impl ::enumcapsulate::VariantDiscriminant for Enum {
     type Discriminant = EnumDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
-        ::core::panicking::panic("internal error: entered unreachable code")
+        match self {
+            Enum::VariantA(_) => EnumDiscriminant::VariantA,
+            Enum::VariantB(_) => EnumDiscriminant::VariantB,
+        }
     }
 }
 fn check<T>()
 where
-    T: VariantDowncast,
+    T: VariantDiscriminant,
 {}
 fn main() {
+    check::<Enum>();
     check::<Enum>();
 }
