@@ -24,10 +24,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- Updated dependencies:
-  - `proc-macro2` from `1.0.76` to `1.0.79`
-  - `syn` from `2.0.48` to `2.0.53`
-- Bumped MSRV from `1.70.0` to `1.74.0`
+- n/a
 
 ### Deprecated
 
@@ -52,6 +49,15 @@ Please make sure to add your changes to the appropriate categories:
 ### Other
 
 - n/a
+
+## [0.2.0] - 2024-03-21
+
+### Changed
+
+- Updated dependencies:
+  - `proc-macro2` from `1.0.76` to `1.0.79`
+  - `syn` from `2.0.48` to `2.0.53`
+- Bumped MSRV from `1.70.0` to `1.74.0`
 
 ## [0.1.0] - TBD
 
