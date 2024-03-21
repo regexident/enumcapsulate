@@ -48,7 +48,6 @@ impl ::core::hash::Hash for EnumDiscriminant {
 }
 #[automatically_derived]
 impl ::core::fmt::Debug for EnumDiscriminant {
-    #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         match *self {}
     }
