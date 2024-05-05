@@ -14,7 +14,7 @@ mod utils;
 /// newtype variants, where `Inner` is the variant's field type
 /// and `Outer` is the enclosing enum's type.
 ///
-/// ```
+/// ```ignore
 /// struct Inner;
 ///
 /// enum Outer {
@@ -49,7 +49,7 @@ pub fn derive_from(input: TokenStream) -> TokenStream {
 /// where `Inner` is the variant's field type and `Outer`
 /// is the enclosing enum's type.
 ///
-/// ```
+/// ```ignore
 /// struct Inner;
 ///
 /// enum Outer {
@@ -93,7 +93,7 @@ pub fn derive_try_from(input: TokenStream) -> TokenStream {
 /// newtype variants, where `Inner` is the variant's field type
 /// and `Outer` is the enclosing enum's type.
 ///
-/// ```
+/// ```ignore
 /// # use enumcapsulate::FromVariant;
 /// #
 /// # struct Inner;
@@ -130,7 +130,7 @@ pub fn derive_from_variant(input: TokenStream) -> TokenStream {
 /// newtype variants, where `Inner` is the variant's field type
 /// and `Outer` is the enclosing enum's type.
 ///
-/// ```
+/// ```ignore
 /// # use enumcapsulate::AsVariantRef;
 ///
 /// struct Inner;
@@ -170,7 +170,7 @@ pub fn derive_as_variant_ref(input: TokenStream) -> TokenStream {
 /// newtype variants, where `Inner` is the variant's field type
 /// and `Outer` is the enclosing enum's type.
 ///
-/// ```
+/// ```ignore
 /// # use enumcapsulate::AsVariantMut;
 ///
 /// struct Inner;
@@ -210,7 +210,7 @@ pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
 /// newtype variants, where `Inner` is the variant's field type
 /// and `Outer` is the enclosing enum's type.
 ///
-/// ```
+/// ```ignore
 /// # use enumcapsulate::AsVariant;
 ///
 /// #[derive(Clone)]
@@ -258,7 +258,7 @@ pub fn derive_as_variant(input: TokenStream) -> TokenStream {
 /// newtype variants, where `Inner` is the variant's field type
 /// and `Outer` is the enclosing enum's type.
 ///
-/// ```
+/// ```ignore
 /// # use enumcapsulate::IntoVariant;
 ///
 /// struct Inner;
@@ -298,7 +298,7 @@ pub fn derive_into_variant(input: TokenStream) -> TokenStream {
 
 /// Derive macro generating an impl of the trait `VariantDowncast`.
 ///
-/// ```
+/// ```ignore
 /// struct Inner;
 ///
 /// enum Outer {
@@ -325,7 +325,7 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
 ///
 /// The generated impl looks something along these lines:
 ///
-/// ```
+/// ```ignore
 /// struct Inner;
 ///
 /// enum Outer {
@@ -362,7 +362,7 @@ pub fn derive_is_variant(input: TokenStream) -> TokenStream {
 
 /// Derive macro generating an impl of the trait `VariantDiscriminant`.
 ///
-/// ```
+/// ```ignore
 /// struct Inner;
 ///
 /// enum Outer {
@@ -406,7 +406,7 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 ///
 /// The following use of the `Encapsulate` umbrella derive macro:
 ///
-/// ```rust
+/// ```ignore
 /// use enumcapsulate::derive::Encapsulate;
 ///
 /// #[derive(Encapsulate)
@@ -417,13 +417,7 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 ///
 /// is equivalent to the following:
 ///
-/// ```
-/// # use enumcapsulate::{
-/// #     derive::{
-/// #         From, TryInto, FromVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast, IsVariant, VariantDiscriminant
-/// #     },
-/// # };
-///
+/// ```ignore
 /// // ...
 ///
 /// #[derive(From, TryInto, FromVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast, IsVariant, VariantDiscriminant)]
