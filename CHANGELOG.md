@@ -24,10 +24,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- Updated dependencies:
-  - `proc-macro2` from `1.0.79` to `1.0.81`
-  - `quote` from `1.0.35` to `1.0.36`
-  - `syn` from `2.0.53` to `2.0.60`
+- n/a
 
 ### Deprecated
 
@@ -52,6 +49,15 @@ Please make sure to add your changes to the appropriate categories:
 ### Other
 
 - n/a
+
+## [0.2.1] - 2024-05-05
+
+### Changed
+
+- Updated dependencies:
+  - `proc-macro2` from `1.0.79` to `1.0.81`
+  - `quote` from `1.0.35` to `1.0.36`
+  - `syn` from `2.0.53` to `2.0.60`
 
 ## [0.2.0] - 2024-03-21
 
