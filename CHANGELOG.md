@@ -25,7 +25,7 @@ Please make sure to add your changes to the appropriate categories:
 ### Changed
 
 - Updated dependencies:
-  - `enumcapsulate-macros` from `0.1.0` to `0.2.0`
+  - `enumcapsulate-macros` from `0.1.0` to `0.2.1`
 
 ### Deprecated
 
