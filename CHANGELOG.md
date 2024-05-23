@@ -20,7 +20,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
-- n/a
+- The `VariantDiscriminant` derive macro now also supports enums with arbitrary variant shapes.
 
 ### Changed
 
