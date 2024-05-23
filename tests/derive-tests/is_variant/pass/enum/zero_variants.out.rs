@@ -5,7 +5,15 @@ impl ::enumcapsulate::IsVariant for Enum {
     where
         T: 'static + ?Sized,
     {
-        ::core::panicking::panic("internal error: entered unreachable code")
+        use ::std::any::TypeId;
+        #[inline]
+        pub fn type_id_of_val<T: 'static + ?Sized>(_val: &T) -> TypeId {
+            TypeId::of::<T>()
+        }
+        let type_id = TypeId::of::<T>();
+        match self {
+            _ => false,
+        }
     }
 }
 fn main() {}

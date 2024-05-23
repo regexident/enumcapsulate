@@ -46,7 +46,7 @@ impl ::enumcapsulate::FromVariant<VariantB> for Enum {
 impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantA> {
         match self {
-            Enum::VariantA(variant) => Some(variant),
+            Enum::VariantA(inner) => Some(inner),
             _ => None,
         }
     }
@@ -54,7 +54,7 @@ impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantRef<VariantB> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantB> {
         match self {
-            Enum::VariantB(variant) => Some(variant),
+            Enum::VariantB(inner) => Some(inner),
             _ => None,
         }
     }
@@ -62,7 +62,7 @@ impl ::enumcapsulate::AsVariantRef<VariantB> for Enum {
 impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantA> {
         match self {
-            Enum::VariantA(variant) => Some(variant),
+            Enum::VariantA(inner) => Some(inner),
             _ => None,
         }
     }
@@ -70,7 +70,7 @@ impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantMut<VariantB> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantB> {
         match self {
-            Enum::VariantB(variant) => Some(variant),
+            Enum::VariantB(inner) => Some(inner),
             _ => None,
         }
     }
@@ -78,7 +78,7 @@ impl ::enumcapsulate::AsVariantMut<VariantB> for Enum {
 impl ::enumcapsulate::IntoVariant<VariantA> for Enum {
     fn into_variant(self) -> Result<VariantA, Self> {
         match self {
-            Enum::VariantA(variant) => Ok(variant),
+            Enum::VariantA(inner) => Ok(inner),
             err => Err(err),
         }
     }
@@ -86,7 +86,7 @@ impl ::enumcapsulate::IntoVariant<VariantA> for Enum {
 impl ::enumcapsulate::IntoVariant<VariantB> for Enum {
     fn into_variant(self) -> Result<VariantB, Self> {
         match self {
-            Enum::VariantB(variant) => Ok(variant),
+            Enum::VariantB(inner) => Ok(inner),
             err => Err(err),
         }
     }
@@ -104,8 +104,9 @@ impl ::enumcapsulate::IsVariant for Enum {
         }
         let type_id = TypeId::of::<T>();
         match self {
-            Enum::VariantA(variant) => type_id_of_val(variant) == type_id,
-            Enum::VariantB(variant) => type_id_of_val(variant) == type_id,
+            Enum::VariantA(inner) => type_id_of_val(inner) == type_id,
+            Enum::VariantB(inner) => type_id_of_val(inner) == type_id,
+            _ => false,
         }
     }
 }
@@ -168,6 +169,7 @@ impl ::enumcapsulate::VariantDiscriminant for Enum {
         match self {
             Enum::VariantA(..) => EnumDiscriminant::VariantA,
             Enum::VariantB(..) => EnumDiscriminant::VariantB,
+            _ => ::core::panicking::panic("internal error: entered unreachable code"),
         }
     }
 }
