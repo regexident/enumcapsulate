@@ -3,12 +3,22 @@ use enumcapsulate::VariantDiscriminant;
 pub struct VariantA;
 pub struct VariantB;
 pub enum Enum {
-    VariantA(VariantA),
-    VariantB(VariantB),
+    Unit,
+    ZeroTupleFields(),
+    ZeroStructFields {},
+    OneTupleField(VariantA),
+    OneStructField { variant_a: VariantA },
+    TwoTupleFields(VariantA, VariantB),
+    TwoStructFields { variant_a: VariantA, variant_b: VariantB },
 }
 pub enum EnumDiscriminant {
-    VariantA,
-    VariantB,
+    Unit,
+    ZeroTupleFields,
+    ZeroStructFields,
+    OneTupleField,
+    OneStructField,
+    TwoTupleFields,
+    TwoStructFields,
 }
 #[automatically_derived]
 impl ::core::marker::Copy for EnumDiscriminant {}
@@ -53,8 +63,13 @@ impl ::core::fmt::Debug for EnumDiscriminant {
         ::core::fmt::Formatter::write_str(
             f,
             match self {
-                EnumDiscriminant::VariantA => "VariantA",
-                EnumDiscriminant::VariantB => "VariantB",
+                EnumDiscriminant::Unit => "Unit",
+                EnumDiscriminant::ZeroTupleFields => "ZeroTupleFields",
+                EnumDiscriminant::ZeroStructFields => "ZeroStructFields",
+                EnumDiscriminant::OneTupleField => "OneTupleField",
+                EnumDiscriminant::OneStructField => "OneStructField",
+                EnumDiscriminant::TwoTupleFields => "TwoTupleFields",
+                EnumDiscriminant::TwoStructFields => "TwoStructFields",
             },
         )
     }
@@ -63,8 +78,13 @@ impl ::enumcapsulate::VariantDiscriminant for Enum {
     type Discriminant = EnumDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {
-            Enum::VariantA(_) => EnumDiscriminant::VariantA,
-            Enum::VariantB(_) => EnumDiscriminant::VariantB,
+            Enum::Unit => EnumDiscriminant::Unit,
+            Enum::ZeroTupleFields(..) => EnumDiscriminant::ZeroTupleFields,
+            Enum::ZeroStructFields { .. } => EnumDiscriminant::ZeroStructFields,
+            Enum::OneTupleField(..) => EnumDiscriminant::OneTupleField,
+            Enum::OneStructField { .. } => EnumDiscriminant::OneStructField,
+            Enum::TwoTupleFields(..) => EnumDiscriminant::TwoTupleFields,
+            Enum::TwoStructFields { .. } => EnumDiscriminant::TwoStructFields,
         }
     }
 }

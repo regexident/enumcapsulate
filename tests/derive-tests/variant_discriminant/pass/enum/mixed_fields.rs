@@ -6,8 +6,18 @@ pub struct VariantB;
 
 #[derive(VariantDiscriminant)]
 pub enum Enum {
-    VariantA(VariantA),
-    VariantB(VariantB),
+    Unit,
+    ZeroTupleFields(),
+    ZeroStructFields {},
+    OneTupleField(VariantA),
+    OneStructField {
+        variant_a: VariantA,
+    },
+    TwoTupleFields(VariantA, VariantB),
+    TwoStructFields {
+        variant_a: VariantA,
+        variant_b: VariantB,
+    },
 }
 
 fn check<T>()
