@@ -58,22 +58,6 @@ mod as_variant_mut {
     }
 }
 
-mod as_variant {
-    #[test]
-    pub fn pass() {
-        tryexpand::expand(["tests/derive-tests/as_variant/pass/**/*.rs"]).and_check();
-    }
-
-    #[test]
-    pub fn fail() {
-        // the failures are already covered by the tests of the individual
-        // derives that this umbrella derive delegates to.
-        //
-        // As such we only have to make sure in `pass()` that
-        // it does actually derive what it says on the tin.
-    }
-}
-
 mod into_variant {
     #[test]
     pub fn pass() {

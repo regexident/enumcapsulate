@@ -1,57 +1,40 @@
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use syn::{Error, Field, Fields, Ident, Type, Variant};
+use syn::{Fields, Ident, Type, Variant};
 
-pub(crate) fn single_field_of_variant(variant: &Variant) -> Result<&Field, Error> {
-    let Fields::Unnamed(field) = &variant.fields else {
-        // let backtrace = std::backtrace::Backtrace::capture();
-        // panic!("You shouldn't be here! {backtrace}");
-
-        return Err(Error::new(
-            variant.ident.span(),
-            "Only enums with tuple variants can use this derive",
-        ));
-    };
-
-    if field.unnamed.len() != 1 {
-        return Err(Error::new(
-            variant.ident.span(),
-            "Only enums with single-element tuple variants can use this derive",
-        ));
-    }
-
-    Ok(field.unnamed.first().unwrap())
+pub(crate) struct FieldInfo<'a> {
+    pub ident: Option<Ident>,
+    pub ty: &'a Type,
 }
 
 pub(crate) struct VariantInfo<'a> {
-    pub ident: &'a Ident,
-    pub inner_ty: &'a Type,
+    pub ident: Ident,
+    pub fields: Vec<FieldInfo<'a>>,
 }
 
-pub(crate) fn infos_per_newtype_variant<'a, I>(variants: I) -> Vec<VariantInfo<'a>>
+pub(crate) fn variant_infos<'a, I>(variants: I) -> Vec<VariantInfo<'a>>
 where
     I: IntoIterator<Item = &'a Variant>,
 {
-    variants
-        .into_iter()
-        .map(|variant| {
-            let field = single_field_of_variant(variant).unwrap();
-            let inner_ty = &field.ty;
-            let ident = &variant.ident;
+    let mut info = vec![];
 
-            VariantInfo { ident, inner_ty }
+    for variant in variants {
+        let ident = variant.ident.clone();
+        let fields = match &variant.fields {
+            Fields::Named(fields) => Vec::from_iter(fields.named.iter()),
+            Fields::Unnamed(fields) => Vec::from_iter(fields.unnamed.iter()),
+            Fields::Unit => vec![],
+        }
+        .into_iter()
+        .map(|field| FieldInfo {
+            ident: field.ident.clone(),
+            ty: &field.ty,
         })
-        .collect::<Vec<VariantInfo>>()
-}
+        .collect();
+        info.push(VariantInfo { ident, fields });
+    }
 
-pub(crate) fn variant_idents<'a, I>(variants: I) -> Vec<Ident>
-where
-    I: IntoIterator<Item = &'a Variant>,
-{
-    variants
-        .into_iter()
-        .map(|variant| variant.ident.clone())
-        .collect::<Vec<_>>()
+    info
 }
 
 #[track_caller]

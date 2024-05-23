@@ -1,7 +1,0 @@
-error: proc-macro derive panicked
- --> /tests/derive-tests/as_variant_mut/fail/enum/unit_variants.rs:5:10
-  |
-5 | #[derive(AsVariantMut)]
-  |          ^^^^^^^^^^^^
-  |
-  = help: message: called `Result::unwrap()` on an `Err` value: Error("Only enums with tuple variants can use this derive")

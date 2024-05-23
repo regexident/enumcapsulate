@@ -24,7 +24,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- n/a
+- Made derive macros more lenient by ignoring inapplicable variants (i.e. with fewer or more than one field), rather than bailing out.
 
 ### Deprecated
 

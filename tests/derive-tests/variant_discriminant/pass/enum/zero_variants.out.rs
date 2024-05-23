@@ -44,7 +44,9 @@ impl ::core::fmt::Debug for EnumDiscriminant {
 impl ::enumcapsulate::VariantDiscriminant for Enum {
     type Discriminant = EnumDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
-        ::core::panicking::panic("internal error: entered unreachable code")
+        match self {
+            _ => ::core::panicking::panic("internal error: entered unreachable code"),
+        }
     }
 }
 fn main() {}

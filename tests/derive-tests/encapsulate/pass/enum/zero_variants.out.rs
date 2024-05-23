@@ -8,7 +8,15 @@ impl ::enumcapsulate::IsVariant for Enum {
     where
         T: 'static + ?Sized,
     {
-        ::core::panicking::panic("internal error: entered unreachable code")
+        use ::std::any::TypeId;
+        #[inline]
+        pub fn type_id_of_val<T: 'static + ?Sized>(_val: &T) -> TypeId {
+            TypeId::of::<T>()
+        }
+        let type_id = TypeId::of::<T>();
+        match self {
+            _ => false,
+        }
     }
 }
 pub enum EnumDiscriminant {}
@@ -55,7 +63,9 @@ impl ::core::fmt::Debug for EnumDiscriminant {
 impl ::enumcapsulate::VariantDiscriminant for Enum {
     type Discriminant = EnumDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
-        ::core::panicking::panic("internal error: entered unreachable code")
+        match self {
+            _ => ::core::panicking::panic("internal error: entered unreachable code"),
+        }
     }
 }
 fn check<T>()
