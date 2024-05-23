@@ -242,38 +242,35 @@ impl EnumDeriver {
 
     pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variants = utils::infos_per_newtype_variant(&self.variants);
+        let variant_idents = utils::variant_idents(&self.variants);
 
         let discriminant_ident = quote::format_ident!("{outer}Discriminant");
-
-        let discriminant_variants = variants.iter().map(|variant_info| {
-            let VariantInfo {
-                ident: inner,
-                inner_ty: _,
-            } = variant_info;
-
-            quote! {
-                #inner
-            }
-        });
 
         let discriminant_enum = quote! {
             #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
             pub enum #discriminant_ident {
-                #(#discriminant_variants),*
+                #(#variant_idents),*
             }
         };
 
-        let match_arms: Vec<_> = variants
-            .into_iter()
-            .map(|variant_info| {
-                let VariantInfo {
-                    ident: inner,
-                    inner_ty: _,
-                } = variant_info;
-
+        let match_arms: Vec<_> = self
+            .variants
+            .iter()
+            .map(|variant| {
+                let ident = &variant.ident;
+                let pattern = match variant.fields {
+                    syn::Fields::Named(_) => quote! {
+                        #outer::#ident { .. }
+                    },
+                    syn::Fields::Unnamed(_) => quote! {
+                        #outer::#ident(..)
+                    },
+                    syn::Fields::Unit => quote! {
+                        #outer::#ident
+                    },
+                };
                 quote! {
-                    #outer::#inner(_) => #discriminant_ident::#inner,
+                    #pattern => #discriminant_ident::#ident,
                 }
             })
             .collect();

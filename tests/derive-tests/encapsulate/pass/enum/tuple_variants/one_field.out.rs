@@ -166,8 +166,8 @@ impl ::enumcapsulate::VariantDiscriminant for Enum {
     type Discriminant = EnumDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {
-            Enum::VariantA(_) => EnumDiscriminant::VariantA,
-            Enum::VariantB(_) => EnumDiscriminant::VariantB,
+            Enum::VariantA(..) => EnumDiscriminant::VariantA,
+            Enum::VariantB(..) => EnumDiscriminant::VariantB,
         }
     }
 }

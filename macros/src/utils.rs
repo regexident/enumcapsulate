@@ -4,6 +4,9 @@ use syn::{Error, Field, Fields, Ident, Type, Variant};
 
 pub(crate) fn single_field_of_variant(variant: &Variant) -> Result<&Field, Error> {
     let Fields::Unnamed(field) = &variant.fields else {
+        // let backtrace = std::backtrace::Backtrace::capture();
+        // panic!("You shouldn't be here! {backtrace}");
+
         return Err(Error::new(
             variant.ident.span(),
             "Only enums with tuple variants can use this derive",
@@ -39,6 +42,16 @@ where
             VariantInfo { ident, inner_ty }
         })
         .collect::<Vec<VariantInfo>>()
+}
+
+pub(crate) fn variant_idents<'a, I>(variants: I) -> Vec<Ident>
+where
+    I: IntoIterator<Item = &'a Variant>,
+{
+    variants
+        .into_iter()
+        .map(|variant| variant.ident.clone())
+        .collect::<Vec<_>>()
 }
 
 #[track_caller]
