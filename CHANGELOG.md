@@ -20,12 +20,11 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
-- The `VariantDiscriminant` derive macro now also supports enums with arbitrary variant shapes.
+- n/a
 
 ### Changed
 
-- Updated dependencies:
-  - `enumcapsulate-macros` from `0.1.0` to `0.2.1`
+- n/a
 
 ### Deprecated
 
@@ -50,6 +49,14 @@ Please make sure to add your changes to the appropriate categories:
 ### Other
 
 - n/a
+
+## [0.2.2] - 2024-05-23
+
+### Changed
+
+- Updated dependencies:
+  - `enumcapsulate-macros` from `0.1.0` to `0.2.1`
+- The `VariantDiscriminant` derive macro now also supports enums with arbitrary variant shapes.
 
 ## [0.2.1] - 2024-05-05
 
