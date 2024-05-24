@@ -9,6 +9,8 @@ pub enum Enum {
     OneStructField { variant: VariantB },
     TwoTupleFields(i32, u32),
     TwoStructFields { a: i32, b: u32 },
+    #[enumcapsulate(exclude)]
+    Excluded(bool),
 }
 impl ::enumcapsulate::FromVariant<VariantA> for Enum {
     fn from_variant(inner: VariantA) -> Self {

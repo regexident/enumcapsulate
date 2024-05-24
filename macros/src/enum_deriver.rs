@@ -29,15 +29,20 @@ impl TryFrom<DeriveInput> for EnumDeriver {
 impl EnumDeriver {
     pub fn derive_from(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants);
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant_info in variant_infos {
             let VariantInfo {
                 ident: inner,
+                attrs,
                 fields,
             } = variant_info;
+
+            if attrs.exclude {
+                continue;
+            }
 
             let [field_info] = &fields[..] else {
                 continue;
@@ -69,15 +74,20 @@ impl EnumDeriver {
 
     pub fn derive_try_into(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants);
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant_info in variant_infos {
             let VariantInfo {
                 ident: inner,
+                attrs,
                 fields,
             } = variant_info;
+
+            if attrs.exclude {
+                continue;
+            }
 
             let [field_info] = &fields[..] else {
                 continue;
@@ -118,15 +128,20 @@ impl EnumDeriver {
 
     pub fn derive_from_variant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants);
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant_info in variant_infos {
             let VariantInfo {
                 ident: inner,
+                attrs,
                 fields,
             } = variant_info;
+
+            if attrs.exclude {
+                continue;
+            }
 
             let [field_info] = &fields[..] else {
                 continue;
@@ -158,15 +173,20 @@ impl EnumDeriver {
 
     pub fn derive_as_variant_ref(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants);
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant_info in variant_infos {
             let VariantInfo {
                 ident: inner,
+                attrs,
                 fields,
             } = variant_info;
+
+            if attrs.exclude {
+                continue;
+            }
 
             let [field_info] = &fields[..] else {
                 continue;
@@ -205,15 +225,20 @@ impl EnumDeriver {
 
     pub fn derive_as_variant_mut(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants);
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant_info in variant_infos {
             let VariantInfo {
                 ident: inner,
+                attrs,
                 fields,
             } = variant_info;
+
+            if attrs.exclude {
+                continue;
+            }
 
             let [field_info] = &fields[..] else {
                 continue;
@@ -252,15 +277,20 @@ impl EnumDeriver {
 
     pub fn derive_into_variant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants);
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant_info in variant_infos {
             let VariantInfo {
                 ident: inner,
+                attrs,
                 fields,
             } = variant_info;
+
+            if attrs.exclude {
+                continue;
+            }
 
             let [field_info] = &fields[..] else {
                 continue;
@@ -309,15 +339,20 @@ impl EnumDeriver {
 
     pub fn derive_is_variant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants);
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut match_arms: Vec<TokenStream2> = vec![];
 
         for variant_info in variant_infos {
             let VariantInfo {
                 ident: inner,
+                attrs,
                 fields,
             } = variant_info;
+
+            if attrs.exclude {
+                continue;
+            }
 
             let [field_info] = &fields[..] else {
                 continue;

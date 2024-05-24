@@ -33,7 +33,7 @@ mod utils;
 /// // ...
 /// ```
 ///
-#[proc_macro_derive(From)]
+#[proc_macro_derive(From, attributes(enumcapsulate))]
 pub fn derive_from(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -77,7 +77,7 @@ pub fn derive_from(input: TokenStream) -> TokenStream {
 /// that's being derives, not `TryInto<T>`.
 /// But since the macro is derived on the enum the latter feels
 /// more appropriate as the derive's name.
-#[proc_macro_derive(TryInto)]
+#[proc_macro_derive(TryInto, attributes(enumcapsulate))]
 pub fn derive_try_from(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -114,7 +114,7 @@ pub fn derive_try_from(input: TokenStream) -> TokenStream {
 /// // ...
 /// ```
 ///
-#[proc_macro_derive(FromVariant)]
+#[proc_macro_derive(FromVariant, attributes(enumcapsulate))]
 pub fn derive_from_variant(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -154,7 +154,7 @@ pub fn derive_from_variant(input: TokenStream) -> TokenStream {
 /// // ...
 /// ```
 ///
-#[proc_macro_derive(AsVariantRef)]
+#[proc_macro_derive(AsVariantRef, attributes(enumcapsulate))]
 pub fn derive_as_variant_ref(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -194,7 +194,7 @@ pub fn derive_as_variant_ref(input: TokenStream) -> TokenStream {
 /// // ...
 /// ```
 ///
-#[proc_macro_derive(AsVariantMut)]
+#[proc_macro_derive(AsVariantMut, attributes(enumcapsulate))]
 pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -235,7 +235,7 @@ pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
 /// // ...
 /// ```
 ///
-#[proc_macro_derive(AsVariant)]
+#[proc_macro_derive(AsVariant, attributes(enumcapsulate))]
 pub fn derive_as_variant(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -286,7 +286,7 @@ pub fn derive_as_variant(input: TokenStream) -> TokenStream {
 /// that's being derives, not `TryInto<T>`.
 /// But since the macro is derived on the enum the latter feels
 /// more appropriate as the derive's name.
-#[proc_macro_derive(IntoVariant)]
+#[proc_macro_derive(IntoVariant, attributes(enumcapsulate))]
 pub fn derive_into_variant(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -311,7 +311,7 @@ pub fn derive_into_variant(input: TokenStream) -> TokenStream {
 /// impl VariantDowncast for Outer {}
 /// ```
 ///
-#[proc_macro_derive(VariantDowncast)]
+#[proc_macro_derive(VariantDowncast, attributes(enumcapsulate))]
 pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -350,7 +350,7 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
 /// // ...
 /// ```
 ///
-#[proc_macro_derive(IsVariant)]
+#[proc_macro_derive(IsVariant, attributes(enumcapsulate))]
 pub fn derive_is_variant(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 
@@ -425,7 +425,7 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 ///     // ...
 /// }
 /// ```
-#[proc_macro_derive(Encapsulate)]
+#[proc_macro_derive(Encapsulate, attributes(enumcapsulate))]
 pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
 

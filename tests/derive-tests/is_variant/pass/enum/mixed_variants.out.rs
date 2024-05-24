@@ -10,6 +10,8 @@ pub enum Enum {
     OneStructField { variant: VariantB },
     TwoTupleFields(i32, u32),
     TwoStructFields { a: i32, b: u32 },
+    #[enumcapsulate(exclude)]
+    Excluded(bool),
 }
 impl ::enumcapsulate::IsVariant for Enum {
     fn is_variant<T>(&self) -> bool
