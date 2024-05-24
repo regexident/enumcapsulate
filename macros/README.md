@@ -26,6 +26,84 @@ The `enumcapsulate-macros` proc-macro crate exports the following derive macros:
 | `TryInto`             | Derive impls for `core::convert::TryInto<T>` for each variant type `T`                                                                                                              |
 | `VariantDiscriminant` | Derive impl for `enumcapsulate::VariantDiscriminant`                                                                                                                                |
 
+# Macro helper attributes
+
+Most of the derive macros support helper attributes:
+
+## `#[enumcapsulate(exclude)]`
+
+The variant-based derive macros in this crate will perform derives for **every single-field variant** they find in the enum.
+This can lead to undesired false positives where a variant like `ToBeExcluded` unintentionally
+gets detected as variant of type `bool`.
+
+Given an enum like this …
+
+```rust
+struct VariantA {
+    // ...
+}
+
+struct VariantB {
+    // ...
+}
+
+#[derive(FromVariant)]
+enum Enum {
+    VariantA(VariantA),
+    VariantB(VariantB),
+    ToBeExcluded { flagToBeExcluded: bool },
+}
+```
+
+… the following implementations get derived from the code above:
+
+```rust
+impl FromVariant<VariantA> for Enum {
+    // ...
+}
+
+impl FromVariant<VariantB> for Enum {
+    // ...
+}
+
+// Notice how the derive picked up the `is_cool: bool` field
+// as an inner variant and generated an impl for it:
+
+impl FromVariant<bool> for Enum {
+    // ...
+}
+```
+
+Adding `#[enumcapsulate(exclude)]` to the undesired variant …
+
+```rust
+#[derive(FromVariant)]
+enum Enum {
+    // ...
+    #[enumcapsulate(exclude)]
+    ToBeExcluded { flag: bool },
+}
+```
+
+… makes the undesired `impl FromVariant<bool> for Enum` get omitted.
+
+## Helper attribute support
+
+Check the matrix below for which derive macros support which helper attributes:
+
+|                       | `#[enumcapsulate(exclude)]` |
+| --------------------- | --------------------------- |
+| `AsVariant`           | ✔ supported                 |
+| `AsVariantMut`        | ✔ supported                 |
+| `AsVariantRef`        | ✔ supported                 |
+| `Encapsulate`         | ✔ supported                 |
+| `From`                | ✔ supported                 |
+| `FromVariant`         | ✔ supported                 |
+| `IntoVariant`         | ✔ supported                 |
+| `IsVariant`           | ✔ supported                 |
+| `TryInto`             | ✔ supported                 |
+| `VariantDiscriminant` | ✘ not supported             |
+
 ## Documentation
 
 Please refer to the documentation on [docs.rs](https://docs.rs/enumcapsulate-macros).

@@ -20,7 +20,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
-- n/a
+- Added `#[enumcapsulate(exclude)]` derive macro helper attribute for exclude specific variants from getting derives.
 
 ### Changed
 

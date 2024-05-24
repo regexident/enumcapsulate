@@ -19,6 +19,8 @@ pub enum Enum {
         a: i32,
         b: u32,
     },
+    #[enumcapsulate(exclude)]
+    Excluded(bool),
 }
 
 impl enumcapsulate::VariantDowncast for Enum {}

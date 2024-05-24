@@ -9,6 +9,8 @@ pub enum Enum {
     OneStructField { variant: VariantB },
     TwoTupleFields(i32, u32),
     TwoStructFields { a: i32, b: u32 },
+    #[enumcapsulate(exclude)]
+    Excluded(bool),
 }
 impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantA> {
