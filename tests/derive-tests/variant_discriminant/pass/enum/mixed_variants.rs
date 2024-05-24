@@ -9,14 +9,9 @@ pub enum Enum {
     ZeroTupleFields(),
     ZeroStructFields {},
     OneTupleField(VariantA),
-    OneStructField {
-        variant_a: VariantA,
-    },
-    TwoTupleFields(VariantA, VariantB),
-    TwoStructFields {
-        variant_a: VariantA,
-        variant_b: VariantB,
-    },
+    OneStructField { variant: VariantB },
+    TwoTupleFields(i32, u32),
+    TwoStructFields { a: i32, b: u32 },
 }
 
 fn main() {

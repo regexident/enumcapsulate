@@ -11,9 +11,14 @@ pub enum Enum {
     ZeroTupleFields(),
     ZeroStructFields {},
     OneTupleField(VariantA),
-    OneStructField { variant: VariantB },
+    OneStructField {
+        variant: VariantB,
+    },
     TwoTupleFields(i32, u32),
-    TwoStructFields { a: i32, b: u32 },
+    TwoStructFields {
+        a: i32,
+        b: u32,
+    },
 }
 
 impl enumcapsulate::VariantDowncast for Enum {}
