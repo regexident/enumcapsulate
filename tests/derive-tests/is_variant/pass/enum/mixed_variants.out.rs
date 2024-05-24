@@ -8,6 +8,8 @@ pub enum Enum {
     ZeroStructFields {},
     OneTupleField(VariantA),
     OneStructField { variant: VariantB },
+    TwoTupleFields(i32, u32),
+    TwoStructFields { a: i32, b: u32 },
 }
 impl ::enumcapsulate::IsVariant for Enum {
     fn is_variant<T>(&self) -> bool
