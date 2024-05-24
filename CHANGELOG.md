@@ -20,11 +20,11 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
-- Added `#[enumcapsulate(exclude)]` derive macro helper attribute for exclude specific variants from getting derives.
+- n/a
 
 ### Changed
 
-- Made derive macros more lenient by ignoring inapplicable variants (i.e. with fewer or more than one field), rather than bailing out.
+- n/a
 
 ### Deprecated
 
@@ -49,6 +49,16 @@ Please make sure to add your changes to the appropriate categories:
 ### Other
 
 - n/a
+
+## [0.3.0] - 2024-05-24
+
+### Added
+
+- Added `#[enumcapsulate(exclude)]` derive macro helper attribute for exclude specific variants from getting derives.
+
+### Changed
+
+- Made derive macros more lenient by ignoring inapplicable variants (i.e. with fewer or more than one field), rather than bailing out.
 
 ## [0.2.2] - 2024-05-23
 
