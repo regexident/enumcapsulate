@@ -87,22 +87,97 @@ enum Enum {
 
 … makes the undesired `impl FromVariant<bool> for Enum` get omitted.
 
+## `#[enumcapsulate(include(field = …_)]`
+
+The variant-based derive macros in this crate will skip derives for **any multi-field variant** they find in the enum.
+
+This can lead to undesired false negatives where a variant like `ToBeIncluded` unintentionally
+gets detected as variant of type `bool`.
+
+For tuple variants the field can be specified by its index: `#[enumcapsulate(include(field = INDEX))]`
+For struct variants the field can be specified by its name: `#[enumcapsulate(include(field = "NAME"))]`
+
+Given an enum like this …
+
+```rust
+struct VariantA {
+    // ...
+}
+
+struct VariantB {
+    // ...
+}
+
+struct VariantC {
+    // ...
+}
+
+#[derive(FromVariant)]
+enum Enum {
+    VariantA(VariantA),
+    ToBeIncludedB(bool, VariantB),
+    ToBeIncludedC { flag: bool, variant: VariantC },
+}
+```
+
+… the following implementations get derived from the code above:
+
+```rust
+impl FromVariant<VariantA> for Enum {
+    // ...
+}
+
+// Notice how the variants `ToBeIncludedB { … }` and `ToBeIncludedC { … }`
+// produced no impls, due to having more than one field.
+```
+
+Adding `#[enumcapsulate(include(field = …))]` to the desired variant,
+with the desired variant field specified …
+
+```rust
+#[derive(FromVariant)]
+enum Enum {
+    // ...
+    #[enumcapsulate(include(field = 1))]
+    ToBeIncludedB(bool, VariantB),
+    #[enumcapsulate(include(field = "variant"))]
+    ToBeIncludedC { flag: bool, variant: VariantC },
+}
+```
+
+… makes the variants have their `impl FromVariant<…> for Enum` get derived as desired:
+
+```rust
+// ...
+
+impl FromVariant<VariantB> for Enum {
+    // ...
+}
+
+impl FromVariant<VariantC> for Enum {
+    // ...
+}
+```
+
+Note however that `#[derive(From)]` and `#[derive(FromVariant)]` (at the current time)
+still won't generate impls for variants with more than one field.
+
 ## Helper attribute support
 
 Check the matrix below for which derive macros support which helper attributes:
 
-|                       | `#[enumcapsulate(exclude)]` |
-| --------------------- | --------------------------- |
-| `AsVariant`           | ✔ supported                 |
-| `AsVariantMut`        | ✔ supported                 |
-| `AsVariantRef`        | ✔ supported                 |
-| `Encapsulate`         | ✔ supported                 |
-| `From`                | ✔ supported                 |
-| `FromVariant`         | ✔ supported                 |
-| `IntoVariant`         | ✔ supported                 |
-| `IsVariant`           | ✔ supported                 |
-| `TryInto`             | ✔ supported                 |
-| `VariantDiscriminant` | ✘ not supported             |
+|                       | `#[enumcapsulate(exclude)]` | `#[enumcapsulate(include(field = …))]` |
+| --------------------- | --------------------------- | -------------------------------------- |
+| `AsVariant`           | ✔ supported                 | ✔ supported                            |
+| `AsVariantMut`        | ✔ supported                 | ✔ supported                            |
+| `AsVariantRef`        | ✔ supported                 | ✔ supported                            |
+| `Encapsulate`         | ✔ supported                 | ✔ supported                            |
+| `From`                | ✔ supported                 | ✘ not supported                        |
+| `FromVariant`         | ✔ supported                 | ✘ not supported                        |
+| `IntoVariant`         | ✔ supported                 | ✔ supported                            |
+| `IsVariant`           | ✔ supported                 | ✔ supported                            |
+| `TryInto`             | ✔ supported                 | ✔ supported                            |
+| `VariantDiscriminant` | ✘ not supported             | ✘ not supported                        |
 
 ## Documentation
 

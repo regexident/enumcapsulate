@@ -15,6 +15,22 @@ impl ::core::clone::Clone for VariantB {
         VariantB
     }
 }
+pub struct VariantC;
+#[automatically_derived]
+impl ::core::clone::Clone for VariantC {
+    #[inline]
+    fn clone(&self) -> VariantC {
+        VariantC
+    }
+}
+pub struct VariantD;
+#[automatically_derived]
+impl ::core::clone::Clone for VariantD {
+    #[inline]
+    fn clone(&self) -> VariantD {
+        VariantD
+    }
+}
 pub enum Enum {
     Unit,
     ZeroTupleFields(),
@@ -25,11 +41,15 @@ pub enum Enum {
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
     Excluded(bool),
+    #[enumcapsulate(include(field = 1))]
+    IncludedTuple(i8, VariantC),
+    #[enumcapsulate(include(field = "variant"))]
+    IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantA> {
         match self {
-            Enum::OneTupleField(inner) => Some(inner),
+            Enum::OneTupleField(inner, ..) => Some(inner),
             _ => None,
         }
     }
@@ -37,7 +57,23 @@ impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantRef<VariantB> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantB> {
         match self {
-            Enum::OneStructField { variant: inner } => Some(inner),
+            Enum::OneStructField { variant: inner, .. } => Some(inner),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariantRef<VariantC> for Enum {
+    fn as_variant_ref(&self) -> Option<&VariantC> {
+        match self {
+            Enum::IncludedTuple(_, inner, ..) => Some(inner),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariantRef<VariantD> for Enum {
+    fn as_variant_ref(&self) -> Option<&VariantD> {
+        match self {
+            Enum::IncludedStruct { variant: inner, .. } => Some(inner),
             _ => None,
         }
     }

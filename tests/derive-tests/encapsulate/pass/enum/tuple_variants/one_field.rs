@@ -2,6 +2,8 @@ use enumcapsulate::{derive::Encapsulate, AsVariantMut, AsVariantRef, IntoVariant
 
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 
 #[derive(Encapsulate)]
 pub enum Enum {

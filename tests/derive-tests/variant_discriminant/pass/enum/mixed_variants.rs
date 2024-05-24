@@ -2,6 +2,8 @@ use enumcapsulate::derive::VariantDiscriminant;
 
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 
 #[derive(VariantDiscriminant)]
 pub enum Enum {

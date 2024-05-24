@@ -1,6 +1,8 @@
 use enumcapsulate::derive::TryInto;
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 pub enum Enum {
     Unit,
     ZeroTupleFields(),
@@ -11,12 +13,16 @@ pub enum Enum {
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
     Excluded(bool),
+    #[enumcapsulate(include(field = 1))]
+    IncludedTuple(i8, VariantC),
+    #[enumcapsulate(include(field = "variant"))]
+    IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::core::convert::TryFrom<Enum> for VariantA {
     type Error = Enum;
     fn try_from(outer: Enum) -> Result<Self, Self::Error> {
         match outer {
-            Enum::OneTupleField(inner) => Ok(inner),
+            Enum::OneTupleField(inner, ..) => Ok(inner),
             err => Err(err),
         }
     }
@@ -25,7 +31,25 @@ impl ::core::convert::TryFrom<Enum> for VariantB {
     type Error = Enum;
     fn try_from(outer: Enum) -> Result<Self, Self::Error> {
         match outer {
-            Enum::OneStructField { variant: inner } => Ok(inner),
+            Enum::OneStructField { variant: inner, .. } => Ok(inner),
+            err => Err(err),
+        }
+    }
+}
+impl ::core::convert::TryFrom<Enum> for VariantC {
+    type Error = Enum;
+    fn try_from(outer: Enum) -> Result<Self, Self::Error> {
+        match outer {
+            Enum::IncludedTuple(_, inner, ..) => Ok(inner),
+            err => Err(err),
+        }
+    }
+}
+impl ::core::convert::TryFrom<Enum> for VariantD {
+    type Error = Enum;
+    fn try_from(outer: Enum) -> Result<Self, Self::Error> {
+        match outer {
+            Enum::IncludedStruct { variant: inner, .. } => Ok(inner),
             err => Err(err),
         }
     }

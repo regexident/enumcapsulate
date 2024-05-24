@@ -2,6 +2,8 @@ use enumcapsulate::derive::FromVariant;
 
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 
 #[derive(FromVariant)]
 pub enum Enum {
@@ -19,6 +21,13 @@ pub enum Enum {
     },
     #[enumcapsulate(exclude)]
     Excluded(bool),
+    #[enumcapsulate(include(field = 1))]
+    IncludedTuple(i8, VariantC),
+    #[enumcapsulate(include(field = "variant"))]
+    IncludedStruct {
+        value: u8,
+        variant: VariantD,
+    },
 }
 
 fn main() {

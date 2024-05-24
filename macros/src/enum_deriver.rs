@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{punctuated::Punctuated, token::Comma, DataEnum, DeriveInput, Fields, Ident, Variant};
+use syn::{parse_quote_spanned, DataEnum, DeriveInput, Fields, Type, Variant};
 
 use crate::utils::{self, FieldInfo, VariantInfo};
 
@@ -29,6 +29,8 @@ impl TryFrom<DeriveInput> for EnumDeriver {
 impl EnumDeriver {
     pub fn derive_from(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
@@ -40,18 +42,23 @@ impl EnumDeriver {
                 fields,
             } = variant_info;
 
-            if attrs.exclude {
+            if attrs.exclude.is_some() {
                 continue;
             }
 
-            let [field_info] = &fields[..] else {
-                continue;
+            let field_info = if let [field_info] = &fields[..] {
+                Some(field_info)
+            } else {
+                None
             };
 
-            let FieldInfo {
+            let Some(FieldInfo {
                 ident: inner_field,
                 ty: inner_ty,
-            } = field_info;
+            }) = field_info
+            else {
+                continue;
+            };
 
             let expression = match inner_field {
                 Some(inner_field) => quote! { Self::#inner { #inner_field: inner} },
@@ -59,7 +66,7 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::core::convert::From<#inner_ty> for #outer {
+                impl ::core::convert::From<#inner_ty> for #outer_ty {
                     fn from(inner: #inner_ty) -> Self {
                         #expression
                     }
@@ -74,6 +81,8 @@ impl EnumDeriver {
 
     pub fn derive_try_into(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
@@ -85,33 +94,47 @@ impl EnumDeriver {
                 fields,
             } = variant_info;
 
-            if attrs.exclude {
+            if attrs.exclude.is_some() {
                 continue;
             }
 
-            let [field_info] = &fields[..] else {
+            let field_info = if let Some(include_info) = &attrs.include {
+                let index = include_info.field.index;
+                Some((index, &fields[index]))
+            } else if let [field_info] = &fields[..] {
+                Some((0, field_info))
+            } else {
+                None
+            };
+
+            let Some((
+                field_index,
+                FieldInfo {
+                    ident: inner_field,
+                    ty: inner_ty,
+                },
+            )) = field_info
+            else {
                 continue;
             };
 
-            let FieldInfo {
-                ident: inner_field,
-                ty: inner_ty,
-            } = field_info;
-
             let pattern = match inner_field {
                 Some(inner_field) => quote! {
-                    #outer::#inner { #inner_field: inner }
+                    #outer_ty::#inner { #inner_field: inner, .. }
                 },
-                None => quote! {
-                    #outer::#inner(inner)
-                },
+                None => {
+                    let underscores = (0..field_index).map(|_| quote! { _, });
+                    quote! {
+                        #outer_ty::#inner(#(#underscores)* inner, ..)
+                    }
+                }
             };
 
             impls.push(quote! {
-                impl ::core::convert::TryFrom<#outer> for #inner_ty {
-                    type Error = #outer;
+                impl ::core::convert::TryFrom<#outer_ty> for #inner_ty {
+                    type Error = #outer_ty;
 
-                    fn try_from(outer: #outer) -> Result<Self, Self::Error> {
+                    fn try_from(outer: #outer_ty) -> Result<Self, Self::Error> {
                         match outer {
                             #pattern => Ok(inner),
                             err => Err(err)
@@ -128,6 +151,8 @@ impl EnumDeriver {
 
     pub fn derive_from_variant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
@@ -139,18 +164,23 @@ impl EnumDeriver {
                 fields,
             } = variant_info;
 
-            if attrs.exclude {
+            if attrs.exclude.is_some() {
                 continue;
             }
 
-            let [field_info] = &fields[..] else {
-                continue;
+            let field_info = if let [field_info] = &fields[..] {
+                Some(field_info)
+            } else {
+                None
             };
 
-            let FieldInfo {
+            let Some(FieldInfo {
                 ident: inner_field,
                 ty: inner_ty,
-            } = field_info;
+            }) = field_info
+            else {
+                continue;
+            };
 
             let expression = match inner_field {
                 Some(inner_field) => quote! { Self::#inner { #inner_field: inner} },
@@ -158,7 +188,7 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::FromVariant<#inner_ty> for #outer {
+                impl ::enumcapsulate::FromVariant<#inner_ty> for #outer_ty {
                     fn from_variant(inner: #inner_ty) -> Self {
                         #expression
                     }
@@ -173,6 +203,8 @@ impl EnumDeriver {
 
     pub fn derive_as_variant_ref(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
@@ -184,30 +216,44 @@ impl EnumDeriver {
                 fields,
             } = variant_info;
 
-            if attrs.exclude {
+            if attrs.exclude.is_some() {
                 continue;
             }
 
-            let [field_info] = &fields[..] else {
+            let field_info = if let Some(include_info) = &attrs.include {
+                let index = include_info.field.index;
+                Some((index, &fields[index]))
+            } else if let [field_info] = &fields[..] {
+                Some((0, field_info))
+            } else {
+                None
+            };
+
+            let Some((
+                field_index,
+                FieldInfo {
+                    ident: inner_field,
+                    ty: inner_ty,
+                },
+            )) = field_info
+            else {
                 continue;
             };
 
-            let FieldInfo {
-                ident: inner_field,
-                ty: inner_ty,
-            } = field_info;
-
             let pattern = match inner_field {
                 Some(inner_field) => quote! {
-                    #outer::#inner { #inner_field: inner }
+                    #outer_ty::#inner { #inner_field: inner, .. }
                 },
-                None => quote! {
-                    #outer::#inner(inner)
-                },
+                None => {
+                    let underscores = (0..field_index).map(|_| quote! { _, });
+                    quote! {
+                        #outer_ty::#inner(#(#underscores)* inner, ..)
+                    }
+                }
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::AsVariantRef<#inner_ty> for #outer {
+                impl ::enumcapsulate::AsVariantRef<#inner_ty> for #outer_ty {
                     fn as_variant_ref(&self) -> Option<&#inner_ty> {
                         match self {
                             #pattern => Some(inner),
@@ -225,6 +271,8 @@ impl EnumDeriver {
 
     pub fn derive_as_variant_mut(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
@@ -236,30 +284,44 @@ impl EnumDeriver {
                 fields,
             } = variant_info;
 
-            if attrs.exclude {
+            if attrs.exclude.is_some() {
                 continue;
             }
 
-            let [field_info] = &fields[..] else {
+            let field_info = if let Some(include_info) = &attrs.include {
+                let index = include_info.field.index;
+                Some((index, &fields[index]))
+            } else if let [field_info] = &fields[..] {
+                Some((0, field_info))
+            } else {
+                None
+            };
+
+            let Some((
+                field_index,
+                FieldInfo {
+                    ident: inner_field,
+                    ty: inner_ty,
+                },
+            )) = field_info
+            else {
                 continue;
             };
 
-            let FieldInfo {
-                ident: inner_field,
-                ty: inner_ty,
-            } = field_info;
-
             let pattern = match inner_field {
                 Some(inner_field) => quote! {
-                    #outer::#inner { #inner_field: inner }
+                    #outer_ty::#inner { #inner_field: inner, .. }
                 },
-                None => quote! {
-                    #outer::#inner(inner)
-                },
+                None => {
+                    let underscores = (0..field_index).map(|_| quote! { _, });
+                    quote! {
+                        #outer_ty::#inner(#(#underscores)* inner, ..)
+                    }
+                }
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::AsVariantMut<#inner_ty> for #outer {
+                impl ::enumcapsulate::AsVariantMut<#inner_ty> for #outer_ty {
                     fn as_variant_mut(&mut self) -> Option<&mut #inner_ty> {
                         match self {
                             #pattern => Some(inner),
@@ -277,6 +339,8 @@ impl EnumDeriver {
 
     pub fn derive_into_variant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
@@ -288,30 +352,44 @@ impl EnumDeriver {
                 fields,
             } = variant_info;
 
-            if attrs.exclude {
+            if attrs.exclude.is_some() {
                 continue;
             }
 
-            let [field_info] = &fields[..] else {
+            let field_info = if let Some(include_info) = &attrs.include {
+                let index = include_info.field.index;
+                Some((index, &fields[index]))
+            } else if let [field_info] = &fields[..] {
+                Some((0, field_info))
+            } else {
+                None
+            };
+
+            let Some((
+                field_index,
+                FieldInfo {
+                    ident: inner_field,
+                    ty: inner_ty,
+                },
+            )) = field_info
+            else {
                 continue;
             };
 
-            let FieldInfo {
-                ident: inner_field,
-                ty: inner_ty,
-            } = field_info;
-
             let pattern = match inner_field {
                 Some(inner_field) => quote! {
-                    #outer::#inner { #inner_field: inner }
+                    #outer_ty::#inner { #inner_field: inner, .. }
                 },
-                None => quote! {
-                    #outer::#inner(inner)
-                },
+                None => {
+                    let underscores = (0..field_index).map(|_| quote! { _, });
+                    quote! {
+                        #outer_ty::#inner(#(#underscores)* inner, ..)
+                    }
+                }
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::IntoVariant<#inner_ty> for #outer {
+                impl ::enumcapsulate::IntoVariant<#inner_ty> for #outer_ty {
                     fn into_variant(self) -> Result<#inner_ty, Self> {
                         match self {
                             #pattern => Ok(inner),
@@ -329,9 +407,10 @@ impl EnumDeriver {
 
     pub fn derive_variant_downcast(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
         let tokens = quote! {
-            impl ::enumcapsulate::VariantDowncast for #outer {}
+            impl ::enumcapsulate::VariantDowncast for #outer_ty {}
         };
 
         Ok(tokens)
@@ -339,6 +418,8 @@ impl EnumDeriver {
 
     pub fn derive_is_variant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
 
         let mut match_arms: Vec<TokenStream2> = vec![];
@@ -350,26 +431,40 @@ impl EnumDeriver {
                 fields,
             } = variant_info;
 
-            if attrs.exclude {
+            if attrs.exclude.is_some() {
                 continue;
             }
 
-            let [field_info] = &fields[..] else {
+            let field_info = if let Some(include_info) = &attrs.include {
+                let index = include_info.field.index;
+                Some((index, &fields[index]))
+            } else if let [field_info] = &fields[..] {
+                Some((0, field_info))
+            } else {
+                None
+            };
+
+            let Some((
+                field_index,
+                FieldInfo {
+                    ident: inner_field,
+                    ty: _,
+                },
+            )) = field_info
+            else {
                 continue;
             };
 
-            let FieldInfo {
-                ident: inner_field,
-                ty: _,
-            } = field_info;
-
             let pattern = match inner_field {
                 Some(inner_field) => quote! {
-                    #outer::#inner { #inner_field: inner }
+                    #outer_ty::#inner { #inner_field: inner, .. }
                 },
-                None => quote! {
-                    #outer::#inner(inner)
-                },
+                None => {
+                    let underscores = (0..field_index).map(|_| quote! { _, });
+                    quote! {
+                        #outer_ty::#inner(#(#underscores)* inner, ..)
+                    }
+                }
             };
 
             match_arms.push(quote! {
@@ -378,7 +473,7 @@ impl EnumDeriver {
         }
 
         Ok(quote! {
-            impl ::enumcapsulate::IsVariant for #outer {
+            impl ::enumcapsulate::IsVariant for #outer_ty {
                 fn is_variant<T>(&self) -> bool
                 where
                     T: 'static + ?Sized
@@ -403,6 +498,8 @@ impl EnumDeriver {
 
     pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
         let discriminant_ident = quote::format_ident!("{outer}Discriminant");
 
         let mut discriminant_variants: Vec<TokenStream2> = vec![];
@@ -429,13 +526,13 @@ impl EnumDeriver {
 
             let pattern = match &variant.fields {
                 Fields::Named(_) => quote! {
-                    #outer::#inner { .. }
+                    #outer_ty::#inner { .. }
                 },
                 Fields::Unnamed(_) => quote! {
-                    #outer::#inner(..)
+                    #outer_ty::#inner(..)
                 },
                 Fields::Unit => quote! {
-                    #outer::#inner
+                    #outer_ty::#inner
                 },
             };
 
@@ -447,7 +544,7 @@ impl EnumDeriver {
         Ok(quote! {
             #discriminant_enum
 
-            impl ::enumcapsulate::VariantDiscriminant for #outer {
+            impl ::enumcapsulate::VariantDiscriminant for #outer_ty {
                 type Discriminant = #discriminant_ident;
 
                 fn variant_discriminant(&self) -> Self::Discriminant {

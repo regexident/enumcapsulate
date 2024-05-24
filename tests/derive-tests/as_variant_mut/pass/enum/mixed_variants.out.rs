@@ -1,6 +1,8 @@
 use enumcapsulate::derive::AsVariantMut;
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 pub enum Enum {
     Unit,
     ZeroTupleFields(),
@@ -11,11 +13,15 @@ pub enum Enum {
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
     Excluded(bool),
+    #[enumcapsulate(include(field = 1))]
+    IncludedTuple(i8, VariantC),
+    #[enumcapsulate(include(field = "variant"))]
+    IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantA> {
         match self {
-            Enum::OneTupleField(inner) => Some(inner),
+            Enum::OneTupleField(inner, ..) => Some(inner),
             _ => None,
         }
     }
@@ -23,7 +29,23 @@ impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantMut<VariantB> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantB> {
         match self {
-            Enum::OneStructField { variant: inner } => Some(inner),
+            Enum::OneStructField { variant: inner, .. } => Some(inner),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariantMut<VariantC> for Enum {
+    fn as_variant_mut(&mut self) -> Option<&mut VariantC> {
+        match self {
+            Enum::IncludedTuple(_, inner, ..) => Some(inner),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariantMut<VariantD> for Enum {
+    fn as_variant_mut(&mut self) -> Option<&mut VariantD> {
+        match self {
+            Enum::IncludedStruct { variant: inner, .. } => Some(inner),
             _ => None,
         }
     }

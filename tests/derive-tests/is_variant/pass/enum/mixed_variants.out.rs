@@ -2,6 +2,8 @@ use enumcapsulate::derive::IsVariant;
 use enumcapsulate::IsVariant;
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 pub enum Enum {
     Unit,
     ZeroTupleFields(),
@@ -12,6 +14,10 @@ pub enum Enum {
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
     Excluded(bool),
+    #[enumcapsulate(include(field = 1))]
+    IncludedTuple(i8, VariantC),
+    #[enumcapsulate(include(field = "variant"))]
+    IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::enumcapsulate::IsVariant for Enum {
     fn is_variant<T>(&self) -> bool
@@ -25,8 +31,14 @@ impl ::enumcapsulate::IsVariant for Enum {
         }
         let type_id = TypeId::of::<T>();
         match self {
-            Enum::OneTupleField(inner) => type_id_of_val(inner) == type_id,
-            Enum::OneStructField { variant: inner } => type_id_of_val(inner) == type_id,
+            Enum::OneTupleField(inner, ..) => type_id_of_val(inner) == type_id,
+            Enum::OneStructField { variant: inner, .. } => {
+                type_id_of_val(inner) == type_id
+            }
+            Enum::IncludedTuple(_, inner, ..) => type_id_of_val(inner) == type_id,
+            Enum::IncludedStruct { variant: inner, .. } => {
+                type_id_of_val(inner) == type_id
+            }
             _ => false,
         }
     }

@@ -1,6 +1,8 @@
 use enumcapsulate::derive::VariantDiscriminant;
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 pub enum Enum {
     Unit,
     ZeroTupleFields(),

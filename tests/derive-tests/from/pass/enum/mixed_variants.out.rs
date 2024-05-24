@@ -1,6 +1,8 @@
 use enumcapsulate::derive::From;
 pub struct VariantA;
 pub struct VariantB;
+pub struct VariantC;
+pub struct VariantD;
 pub enum Enum {
     Unit,
     ZeroTupleFields(),
@@ -11,6 +13,10 @@ pub enum Enum {
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
     Excluded(bool),
+    #[enumcapsulate(include(field = 1))]
+    IncludedTuple(i8, VariantC),
+    #[enumcapsulate(include(field = "variant"))]
+    IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::core::convert::From<VariantA> for Enum {
     fn from(inner: VariantA) -> Self {
