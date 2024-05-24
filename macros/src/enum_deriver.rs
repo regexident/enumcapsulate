@@ -5,33 +5,33 @@ use syn::{parse_quote_spanned, DataEnum, DeriveInput, Fields, Type, Variant};
 use crate::utils::{self, FieldInfo, VariantInfo};
 
 pub(crate) struct EnumDeriver {
-    ident: Ident,
-    variants: Punctuated<Variant, Comma>,
+    input: DeriveInput,
 }
 
-impl TryFrom<DeriveInput> for EnumDeriver {
-    type Error = syn::Error;
-
-    fn try_from(input: DeriveInput) -> Result<Self, Self::Error> {
-        let DeriveInput { ident, data, .. } = input;
-
-        let syn::Data::Enum(DataEnum { variants, .. }) = data else {
-            return Err(syn::Error::new(
-                ident.span(),
-                "Only enums can use this derive",
-            ));
-        };
-
-        Ok(Self { ident, variants })
+impl From<DeriveInput> for EnumDeriver {
+    fn from(input: DeriveInput) -> Self {
+        Self { input }
     }
 }
 
 impl EnumDeriver {
+    fn variants(&self) -> Result<Vec<&Variant>, syn::Error> {
+        let syn::Data::Enum(DataEnum { variants, .. }) = &self.input.data else {
+            return Err(syn::Error::new(
+                self.input.ident.span(),
+                "Only enums can use this derive",
+            ));
+        };
+
+        Ok(Vec::from_iter(variants.iter()))
+    }
+
     pub fn derive_from(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -80,10 +80,11 @@ impl EnumDeriver {
     }
 
     pub fn derive_try_into(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -150,10 +151,11 @@ impl EnumDeriver {
     }
 
     pub fn derive_from_variant(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -202,10 +204,11 @@ impl EnumDeriver {
     }
 
     pub fn derive_as_variant_ref(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -270,10 +273,11 @@ impl EnumDeriver {
     }
 
     pub fn derive_as_variant_mut(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -338,10 +342,11 @@ impl EnumDeriver {
     }
 
     pub fn derive_into_variant(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -406,7 +411,7 @@ impl EnumDeriver {
     }
 
     pub fn derive_variant_downcast(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
         let tokens = quote! {
@@ -417,10 +422,11 @@ impl EnumDeriver {
     }
 
     pub fn derive_is_variant(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let variant_infos: Vec<VariantInfo> = utils::variant_infos(&self.variants)?;
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
 
         let mut match_arms: Vec<TokenStream2> = vec![];
 
@@ -497,14 +503,16 @@ impl EnumDeriver {
     }
 
     pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
-        let outer = &self.ident;
+        let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
+        let variants = self.variants()?;
 
         let discriminant_ident = quote::format_ident!("{outer}Discriminant");
 
         let mut discriminant_variants: Vec<TokenStream2> = vec![];
 
-        for variant in &self.variants {
+        for variant in &variants {
             let variant_ident = &variant.ident;
 
             discriminant_variants.push(quote! {
@@ -521,7 +529,7 @@ impl EnumDeriver {
 
         let mut match_arms: Vec<TokenStream2> = vec![];
 
-        for variant in &self.variants {
+        for variant in variants {
             let inner = &variant.ident;
 
             let pattern = match &variant.fields {
