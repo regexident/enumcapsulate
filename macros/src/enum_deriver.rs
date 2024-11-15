@@ -1,9 +1,10 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{parse_quote_spanned, DataEnum, DeriveInput, Fields, Type, Variant};
+use syn::{parse_quote_spanned, visit::Visit as _, DataEnum, DeriveInput, Fields, Type, Variant};
 
 use crate::{
     config_for_enum_with_attrs, config_for_variant, macro_name, position_of_selected_field,
+    TypeVisitor,
 };
 
 pub(crate) struct EnumDeriver {
@@ -43,6 +44,8 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant in self.variants()? {
@@ -64,6 +67,10 @@ impl EnumDeriver {
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
             let inner_ty = &inner_field.ty;
+
+            if self.uses_generic_const_or_type(inner_ty) {
+                continue;
+            }
 
             let field_expressions: Vec<_> = fields
                 .iter()
@@ -92,7 +99,7 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::core::convert::From<#inner_ty> for #outer_ty {
+                impl #impl_generics ::core::convert::From<#inner_ty> for #outer_ty #type_generics #where_clause {
                     fn from(inner: #inner_ty) -> Self {
                         #expression
                     }
@@ -115,6 +122,8 @@ impl EnumDeriver {
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -139,6 +148,10 @@ impl EnumDeriver {
             let inner_ident = inner_field.ident.as_ref();
             let inner_ty = &inner_field.ty;
 
+            if self.uses_generic_const_or_type(inner_ty) {
+                continue;
+            }
+
             let pattern = match &variant.fields {
                 Fields::Named(_) => {
                     let field = inner_ident;
@@ -154,10 +167,10 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::core::convert::TryFrom<#outer_ty> for #inner_ty {
-                    type Error = #outer_ty;
+                impl #impl_generics ::core::convert::TryFrom<#outer_ty #type_generics> for #inner_ty #where_clause {
+                    type Error = #outer_ty #type_generics;
 
-                    fn try_from(outer: #outer_ty) -> Result<Self, Self::Error> {
+                    fn try_from(outer: #outer_ty #type_generics) -> Result<Self, Self::Error> {
                         match outer {
                             #pattern => Ok(inner),
                             err => Err(err)
@@ -183,6 +196,8 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant in self.variants()? {
@@ -204,6 +219,10 @@ impl EnumDeriver {
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
             let inner_ty = &inner_field.ty;
+
+            if self.uses_generic_const_or_type(inner_ty) {
+                continue;
+            }
 
             let field_expressions: Vec<_> = fields
                 .iter()
@@ -232,7 +251,7 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::FromVariant<#inner_ty> for #outer_ty {
+                impl #impl_generics ::enumcapsulate::FromVariant<#inner_ty> for #outer_ty #type_generics #where_clause {
                     fn from_variant(inner: #inner_ty) -> Self {
                         #expression
                     }
@@ -255,6 +274,8 @@ impl EnumDeriver {
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
@@ -279,6 +300,10 @@ impl EnumDeriver {
             let inner_ident = inner_field.ident.as_ref();
             let inner_ty = &inner_field.ty;
 
+            if self.uses_generic_const_or_type(inner_ty) {
+                continue;
+            }
+
             let pattern = match &variant.fields {
                 Fields::Named(_) => {
                     let field = inner_ident;
@@ -293,11 +318,13 @@ impl EnumDeriver {
                 Fields::Unit => continue,
             };
 
+            let where_clause = match where_clause {
+                Some(where_clause) => quote! { #where_clause #inner_ty: Clone },
+                None => quote! { where #inner_ty: Clone },
+            };
+
             impls.push(quote! {
-                impl ::enumcapsulate::AsVariant<#inner_ty> for #outer_ty
-                where
-                    #inner_ty: Clone
-                {
+                impl #impl_generics ::enumcapsulate::AsVariant<#inner_ty> for #outer_ty #type_generics #where_clause {
                     fn as_variant(&self) -> Option<#inner_ty> {
                         match self {
                             #pattern => Some(inner.clone()),
@@ -324,6 +351,8 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant in self.variants()? {
@@ -347,6 +376,9 @@ impl EnumDeriver {
             let inner_ident = inner_field.ident.as_ref();
             let inner_ty = &inner_field.ty;
 
+            if self.uses_generic_const_or_type(inner_ty) {
+                continue;
+            }
             let pattern = match &variant.fields {
                 Fields::Named(_) => {
                     let field = inner_ident;
@@ -362,7 +394,7 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::AsVariantRef<#inner_ty> for #outer_ty {
+                impl #impl_generics ::enumcapsulate::AsVariantRef<#inner_ty> for #outer_ty #type_generics #where_clause {
                     fn as_variant_ref(&self) -> Option<&#inner_ty> {
                         match self {
                             #pattern => Some(inner),
@@ -389,6 +421,8 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant in self.variants()? {
@@ -412,6 +446,10 @@ impl EnumDeriver {
             let inner_ident = inner_field.ident.as_ref();
             let inner_ty = &inner_field.ty;
 
+            if self.uses_generic_const_or_type(inner_ty) {
+                continue;
+            }
+
             let pattern = match &variant.fields {
                 Fields::Named(_) => {
                     let field = inner_ident;
@@ -427,7 +465,7 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::AsVariantMut<#inner_ty> for #outer_ty {
+                impl #impl_generics ::enumcapsulate::AsVariantMut<#inner_ty> for #outer_ty #type_generics #where_clause {
                     fn as_variant_mut(&mut self) -> Option<&mut #inner_ty> {
                         match self {
                             #pattern => Some(inner),
@@ -454,6 +492,8 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+
         let mut impls: Vec<TokenStream2> = vec![];
 
         for variant in self.variants()? {
@@ -477,6 +517,10 @@ impl EnumDeriver {
             let inner_ident = inner_field.ident.as_ref();
             let inner_ty = &inner_field.ty;
 
+            if self.uses_generic_const_or_type(inner_ty) {
+                continue;
+            }
+
             let pattern = match &variant.fields {
                 Fields::Named(_) => {
                     let field = inner_ident;
@@ -492,7 +536,7 @@ impl EnumDeriver {
             };
 
             impls.push(quote! {
-                impl ::enumcapsulate::IntoVariant<#inner_ty> for #outer_ty {
+                impl #impl_generics ::enumcapsulate::IntoVariant<#inner_ty> for #outer_ty #type_generics #where_clause {
                     fn into_variant(self) -> Result<#inner_ty, Self> {
                         match self {
                             #pattern => Ok(inner),
@@ -523,8 +567,10 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+
         let tokens = quote! {
-            impl ::enumcapsulate::VariantDowncast for #outer_ty {}
+            impl #impl_generics ::enumcapsulate::VariantDowncast for #outer_ty #type_generics #where_clause {}
         };
 
         Ok(tokens)
@@ -544,6 +590,8 @@ impl EnumDeriver {
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
+        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
 
         let variants = self.variants()?;
 
@@ -592,7 +640,7 @@ impl EnumDeriver {
         Ok(quote! {
             #discriminant_enum
 
-            impl ::enumcapsulate::VariantDiscriminant for #outer_ty {
+            impl #impl_generics ::enumcapsulate::VariantDiscriminant for #outer_ty #type_generics #where_clause {
                 type Discriminant = #discriminant_ident;
 
                 fn variant_discriminant(&self) -> Self::Discriminant {
@@ -603,5 +651,13 @@ impl EnumDeriver {
                 }
             }
         })
+    }
+
+    fn uses_generic_const_or_type(&self, ty: &syn::Type) -> bool {
+        let mut visitor = TypeVisitor::new(&self.input.generics);
+
+        visitor.visit_type(ty);
+
+        visitor.uses_const_or_type_param()
     }
 }

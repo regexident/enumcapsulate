@@ -5,10 +5,12 @@ use crate::utils::tokenstream;
 
 mod config;
 mod enum_deriver;
+mod type_visitor;
 mod utils;
 
 use config::*;
 use enum_deriver::*;
+use type_visitor::*;
 use utils::*;
 
 /// Derive macro generating an impl of the trait `From<T>`.
