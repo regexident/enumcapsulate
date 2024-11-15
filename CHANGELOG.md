@@ -25,6 +25,7 @@ Please make sure to add your changes to the appropriate categories:
 - Added enum-level `#[enumcapsulate(exclude)]`/`#[enumcapsulate(exclude(…))]` helper attribute.
 - Added optional selection list to variant-level `#[enumcapsulate(exclude(…))]` helper attribute.
 - Added optional selection list to variant-level `#[enumcapsulate(include(…))]` helper attribute.
+- Added derive support for generic enums (by force-excluding variants that use generic const/type parameters).
 
 ### Changed
 
