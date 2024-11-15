@@ -1,4 +1,4 @@
-use enumcapsulate::derive::AsVariantMut;
+use enumcapsulate::AsVariantMut;
 
 pub struct VariantA;
 pub struct VariantB;
@@ -31,7 +31,7 @@ pub enum Enum {
 }
 
 fn main() {
-    use enumcapsulate::AsVariantMut;
+
 
     let mut subject = Enum::Unit;
 

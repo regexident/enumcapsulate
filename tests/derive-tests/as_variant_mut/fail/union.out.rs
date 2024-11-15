@@ -1,4 +1,4 @@
-use enumcapsulate::derive::AsVariantMut;
+use enumcapsulate::AsVariantMut;
 pub union Union {
     field: (),
 }

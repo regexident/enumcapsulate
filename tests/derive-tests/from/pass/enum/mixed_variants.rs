@@ -1,4 +1,4 @@
-use enumcapsulate::derive::From;
+use enumcapsulate::From;
 
 pub struct VariantA;
 pub struct VariantB;

@@ -1,4 +1,4 @@
-use enumcapsulate::derive::VariantDiscriminant;
+use enumcapsulate::VariantDiscriminant;
 
 pub struct VariantA;
 pub struct VariantB;
@@ -17,7 +17,7 @@ pub enum Enum {
 }
 
 fn main() {
-    use enumcapsulate::VariantDiscriminant;
+
 
     fn check<T>()
     where

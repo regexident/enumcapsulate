@@ -1,4 +1,4 @@
-use enumcapsulate::{derive::Encapsulate, AsVariantMut, AsVariantRef, IntoVariant};
+use enumcapsulate::{AsVariantMut, AsVariantRef, Encapsulate, IntoVariant};
 pub struct VariantA;
 pub struct VariantB;
 pub struct VariantC;

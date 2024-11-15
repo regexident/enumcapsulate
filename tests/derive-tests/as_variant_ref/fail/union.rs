@@ -1,4 +1,4 @@
-use enumcapsulate::derive::AsVariantRef;
+use enumcapsulate::AsVariantRef;
 
 #[derive(AsVariantRef)]
 pub union Union {

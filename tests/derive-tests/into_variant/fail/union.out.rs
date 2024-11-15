@@ -1,4 +1,4 @@
-use enumcapsulate::derive::IntoVariant;
+use enumcapsulate::IntoVariant;
 pub union Union {
     field: (),
 }
