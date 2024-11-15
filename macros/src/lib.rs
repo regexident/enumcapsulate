@@ -407,7 +407,7 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 /// The following use of the `Encapsulate` umbrella derive macro:
 ///
 /// ```ignore
-/// use enumcapsulate::derive::Encapsulate;
+/// use enumcapsulate::Encapsulate;
 ///
 /// #[derive(Encapsulate)
 /// enum Outer {

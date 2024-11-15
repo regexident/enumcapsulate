@@ -1,17 +1,7 @@
 //! Traits and corresponding derive macros for enum-based encapsulation.
 
-/// Macros.
 #[cfg(feature = "macros")]
-pub use enumcapsulate_macros as macros;
-
-/// Derive macros.
-#[cfg(feature = "derive")]
-pub mod derive {
-    pub use super::macros::{
-        AsVariant, AsVariantMut, AsVariantRef, Encapsulate, From, FromVariant, IntoVariant,
-        IsVariant, TryInto, VariantDiscriminant,
-    };
-}
+pub use enumcapsulate_macros::*;
 
 /// Used to do variant-to-enum conversions
 /// between an outer enum's and its inner variant's type.
