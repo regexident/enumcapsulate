@@ -24,7 +24,9 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- n/a
+- Removed `enumcapsulate::macros` and its redundant `enumcapsulate::derive` module in favor of re-exporting its items directly from `crate::*`, thus eliminating the need for individually importing trait + derive macro pairs:
+  - Before: `use enumcapsulate::{derive::FromVariant, FromVariant};`
+  - After: `use enumcapsulate::FromVariant;`
 
 ### Deprecated
 
