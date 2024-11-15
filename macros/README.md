@@ -291,6 +291,97 @@ This attribute is recognized by the following variant-based derive macros:
 
 - `Encapsulate`
 
+## Generics
+
+There is limited support for generic enums:
+
+Variants using generic const/type parameters are always excluded when deriving generic traits with `enumcapsulate`'s derive macros.
+
+The reason for this behavior is that implementing generic traits for variants that use any of the generic parameters of the enum tends to result in conflicting implementations in Rust, as shown by the following example program:
+
+```rust
+use enumcapsulate::FromVariant;
+
+pub struct VariantA;
+pub struct VariantB;
+
+#[derive(FromVariant)]
+// error[E0119]: conflicting implementations of trait `FromVariant<VariantB>` for type `Enum<VariantB>`
+pub enum Enum<T> {
+    Unit,
+    Generic(T),
+    NonGeneric(VariantB),
+}
+
+fn main() {
+    let _: Enum<VariantA> = Enum::from_variant(VariantA);
+    let _: Enum<VariantA> = Enum::from_variant(VariantB);
+}
+```
+
+The expanded version of the above makes it easier to see why: The compiler can't prove that `T` and `VariantB` are disjoint types.
+
+```rust
+pub struct VariantA;
+pub struct VariantB;
+
+pub enum Enum<T> {
+    Unit,
+    Generic(T),
+    NonGeneric(VariantB),
+}
+
+impl<T> FromVariant<T> for Enum<T> { // <- first implementation here
+    fn from_variant(variant: T) -> Self {
+        Self::Generic(variant)
+    }
+}
+
+// error[E0119]: conflicting implementations of trait `FromVariant<VariantB>` for type `Enum<VariantB>`
+impl<T> FromVariant<VariantB> for Enum<T> { // <- conflicting implementation for `Enum<VariantB>`
+    fn from_variant(variant: VariantB) -> Self {
+        Self::NonGeneric(variant)
+    }
+}
+
+fn main() {
+    let _: Enum<VariantA> = Enum::from_variant(VariantA);
+    let _: Enum<VariantA> = Enum::from_variant(VariantB);
+}
+```
+
+So in order to avoid such pitfalls altogether `enumcapsulate`'s derive macros will skip `impl<T> FromVariant<T> for Enum<T>`, since it uses a generic type (or const) parameter of `Enum<T>`.
+
+So all you have to do is provide your own non-generic implementations for specific type instances of your generic type yourself, filling any gaps left behind by the derive macro:
+
+```rust
+use enumcapsulate::FromVariant;
+
+pub struct VariantA;
+pub struct VariantB;
+
+#[derive(FromVariant)]
+pub enum Enum<T> {
+    Unit,
+    Generic(T),
+    NonGeneric(VariantB),
+}
+
+// Notice how the trait is implemented on
+// a specific type of the `Enum<T>` kind,
+// rather than on the generic kind itself:
+impl From<VariantA> for Enum<VariantA> {
+    fn from(value: VariantA) -> Self {
+        Self::Generic(value)
+    }
+}
+
+fn main() {
+    let _: Enum<VariantA> = Enum::from_variant(VariantA);
+    let _: Enum<VariantA> = Enum::from_variant(VariantB);
+}
+```
+
 ## Documentation
 
 Please refer to the documentation on [docs.rs](https://docs.rs/enumcapsulate-macros).
