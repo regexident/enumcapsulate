@@ -1,3 +1,3 @@
-use enumcapsulate::derive::AsVariantRef;
+use enumcapsulate::AsVariantRef;
 pub enum Enum {}
 fn main() {}

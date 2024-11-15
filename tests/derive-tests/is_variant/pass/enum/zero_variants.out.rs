@@ -1,4 +1,4 @@
-use enumcapsulate::derive::IsVariant;
+use enumcapsulate::IsVariant;
 pub enum Enum {}
 impl ::enumcapsulate::IsVariant for Enum {
     fn is_variant<T>(&self) -> bool

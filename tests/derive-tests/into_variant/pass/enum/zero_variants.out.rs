@@ -1,3 +1,3 @@
-use enumcapsulate::derive::IntoVariant;
+use enumcapsulate::IntoVariant;
 pub enum Enum {}
 fn main() {}

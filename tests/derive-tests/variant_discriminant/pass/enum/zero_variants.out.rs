@@ -1,4 +1,4 @@
-use enumcapsulate::derive::VariantDiscriminant;
+use enumcapsulate::VariantDiscriminant;
 pub enum Enum {}
 pub enum EnumDiscriminant {}
 #[automatically_derived]

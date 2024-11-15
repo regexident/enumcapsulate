@@ -1,4 +1,4 @@
-use enumcapsulate::derive::TryInto;
+use enumcapsulate::TryInto;
 pub struct VariantA;
 pub struct VariantB;
 pub struct VariantC;

@@ -1,3 +1,3 @@
-use enumcapsulate::derive::AsVariantMut;
+use enumcapsulate::AsVariantMut;
 pub enum Enum {}
 fn main() {}

@@ -1,4 +1,4 @@
-use enumcapsulate::derive::From;
+use enumcapsulate::From;
 
 #[derive(From)]
 pub enum Enum {}

@@ -1,4 +1,4 @@
-use enumcapsulate::derive::FromVariant;
+use enumcapsulate::FromVariant;
 pub struct VariantA;
 pub struct VariantB;
 pub struct VariantC;
@@ -31,7 +31,6 @@ impl ::enumcapsulate::FromVariant<VariantB> for Enum {
     }
 }
 fn main() {
-    use enumcapsulate::FromVariant;
     let _ = Enum::from_variant(VariantA);
     let _ = Enum::from_variant(VariantB);
 }

@@ -1,4 +1,4 @@
-use enumcapsulate::derive::{AsVariantMut, AsVariantRef, IntoVariant};
+use enumcapsulate::{AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast};
 
 #[derive(Clone)]
 pub struct VariantA;
@@ -34,11 +34,9 @@ pub enum Enum {
     },
 }
 
-impl enumcapsulate::VariantDowncast for Enum {}
+impl VariantDowncast for Enum {}
 
 fn main() {
-    use enumcapsulate::VariantDowncast;
-
     let mut subject = Enum::Unit;
 
     {

@@ -1,5 +1,5 @@
 use enumcapsulate::{
-    derive::Encapsulate, AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast,
+    AsVariantMut, AsVariantRef, Encapsulate, IntoVariant, VariantDowncast,
 };
 pub enum Enum {}
 impl ::enumcapsulate::VariantDowncast for Enum {}

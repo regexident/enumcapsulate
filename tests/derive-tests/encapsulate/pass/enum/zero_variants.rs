@@ -1,6 +1,4 @@
-use enumcapsulate::{
-    derive::Encapsulate, AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast,
-};
+use enumcapsulate::{AsVariantMut, AsVariantRef, Encapsulate, IntoVariant, VariantDowncast};
 
 #[derive(Encapsulate)]
 pub enum Enum {}

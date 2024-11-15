@@ -1,4 +1,4 @@
-use enumcapsulate::derive::VariantDiscriminant;
+use enumcapsulate::VariantDiscriminant;
 
 #[derive(VariantDiscriminant)]
 pub enum Enum {}

@@ -1,4 +1,4 @@
-use enumcapsulate::derive::IntoVariant;
+use enumcapsulate::IntoVariant;
 
 pub struct VariantA;
 pub struct VariantB;
@@ -31,7 +31,7 @@ pub enum Enum {
 }
 
 fn main() {
-    use enumcapsulate::IntoVariant;
+
 
     {
         let subject = Enum::Unit;

@@ -1,4 +1,4 @@
-use enumcapsulate::derive::IntoVariant;
+use enumcapsulate::IntoVariant;
 
 #[derive(IntoVariant)]
 pub enum Enum {}

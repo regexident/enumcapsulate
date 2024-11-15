@@ -21,9 +21,9 @@ fn from() {
 }
 
 mod into {
-    use super::*;
-
     use enumcapsulate_macros::TryInto;
+
+    use super::*;
 
     #[derive(Clone, PartialEq, Debug, TryInto)]
     enum Enum {
@@ -49,7 +49,6 @@ mod into {
 #[test]
 fn from_variant() {
     use enumcapsulate::FromVariant;
-    use enumcapsulate_macros::FromVariant;
 
     #[derive(PartialEq, Debug, FromVariant)]
     enum Enum {
@@ -62,10 +61,9 @@ fn from_variant() {
 }
 
 mod into_variant {
-    use super::*;
-
     use enumcapsulate::IntoVariant;
-    use enumcapsulate_macros::IntoVariant;
+
+    use super::*;
 
     #[derive(Clone, PartialEq, Debug, IntoVariant)]
     enum Enum {
@@ -89,10 +87,9 @@ mod into_variant {
 }
 
 mod as_variant_ref {
-    use super::*;
-
     use enumcapsulate::AsVariantRef;
-    use enumcapsulate_macros::AsVariantRef;
+
+    use super::*;
 
     #[derive(PartialEq, Debug, AsVariantRef)]
     enum Enum {
@@ -116,10 +113,9 @@ mod as_variant_ref {
 }
 
 mod as_variant_mut {
-    use super::*;
-
     use enumcapsulate::AsVariantMut;
-    use enumcapsulate_macros::AsVariantMut;
+
+    use super::*;
 
     #[derive(PartialEq, Debug, AsVariantMut)]
     enum Enum {
@@ -143,10 +139,9 @@ mod as_variant_mut {
 }
 
 mod as_variant {
-    use super::*;
-
     use enumcapsulate::AsVariantRef;
-    use enumcapsulate_macros::AsVariantRef;
+
+    use super::*;
 
     #[derive(PartialEq, Debug, AsVariantRef)]
     enum Enum {
@@ -172,7 +167,6 @@ mod as_variant {
 #[test]
 fn is_variant() {
     use enumcapsulate::IsVariant;
-    use enumcapsulate_macros::IsVariant;
 
     #[derive(PartialEq, Debug, IsVariant)]
     enum Enum {
@@ -187,7 +181,6 @@ fn is_variant() {
 #[test]
 fn variant_discriminant() {
     use enumcapsulate::VariantDiscriminant;
-    use enumcapsulate_macros::VariantDiscriminant;
 
     #[derive(PartialEq, Debug, VariantDiscriminant)]
     enum Enum {

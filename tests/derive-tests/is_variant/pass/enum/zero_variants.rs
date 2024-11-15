@@ -1,4 +1,4 @@
-use enumcapsulate::derive::IsVariant;
+use enumcapsulate::IsVariant;
 
 #[derive(IsVariant)]
 pub enum Enum {}

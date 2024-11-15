@@ -1,4 +1,3 @@
-use enumcapsulate::derive::IsVariant;
 use enumcapsulate::IsVariant;
 pub struct VariantA;
 pub struct VariantB;

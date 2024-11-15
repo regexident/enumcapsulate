@@ -1,4 +1,4 @@
-use enumcapsulate::derive::AsVariantRef;
+use enumcapsulate::AsVariantRef;
 pub struct VariantA;
 #[automatically_derived]
 impl ::core::clone::Clone for VariantA {
@@ -79,7 +79,6 @@ impl ::enumcapsulate::AsVariantRef<VariantD> for Enum {
     }
 }
 fn main() {
-    use enumcapsulate::AsVariantRef;
     let subject = Enum::Unit;
     let _: Option<&VariantA> = subject.as_variant_ref();
     let _: Option<&VariantB> = subject.as_variant_ref();
