@@ -25,7 +25,7 @@ The `enumcapsulate` crate exports the following traits:
 | `VariantDiscriminant` | Used to obtain an enum variant's discriminant                                                                                                                                       |
 | `VariantDowncast`     | Convenience umbrella trait utilizing `AsVariantRef`, `AsVariantMut`, and `IntoVariant`                                                                                              |
 
-as well as the following corresponding derive macros via `enumcapsulate::derive::*`:
+as well as the following corresponding derive macros via `enumcapsulate::*`:
 
 - `AsVariant`
 - `AsVariantMut`

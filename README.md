@@ -27,7 +27,7 @@ The `enumcapsulate` crate exports the following traits:
 
 ## Derive macros
 
-as well as the following corresponding derive macros via `enumcapsulate::derive::*`:
+The `enumcapsulate` crate exports the following corresponding derive macros, if the `"derive"` feature is enabled (which is the default):
 
 - `AsVariant`
 - `AsVariantMut`
