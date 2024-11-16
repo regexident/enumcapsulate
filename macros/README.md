@@ -13,18 +13,18 @@ Derive macros for [enumcapsulate](https://crates.io/crates/enumcapsulate) crate.
 
 The `enumcapsulate-macros` proc-macro crate exports the following derive macros:
 
-| Derive macro          | Functionality                                                                                                                                                                       |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AsVariant`           | Umbrella derive macro for `AsVariantRef`, and `AsVariantMut`                                                                                                                        |
-| `AsVariantMut`        | Derive impls for `enumcapsulate::AsVariantMut<T>` for each variant type `T`                                                                                                         |
-| `AsVariantRef`        | Derive impls for `enumcapsulate::AsVariantRef<T>` for each variant type `T`                                                                                                         |
-| `Encapsulate`         | Umbrella derive macro for `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `IsVariant`, `TryInto`, `VariantDiscriminant`, and `VariantDowncast` `AsVariantMut` |
-| `From`                | Derive impls for `core::convert::From<T>` for each variant type `T`                                                                                                                 |
-| `FromVariant`         | Derive impls for `enumcapsulate::FromVariant<T>` for each variant type `T`                                                                                                          |
-| `IntoVariant`         | Derive impls for `enumcapsulate::FromVariant<T>` for each variant type `T`                                                                                                          |
-| `IsVariant`           | Derive impl for `enumcapsulate::IsVariant`                                                                                                                                          |
-| `TryInto`             | Derive impls for `core::convert::TryInto<T>` for each variant type `T`                                                                                                              |
-| `VariantDiscriminant` | Derive impl for `enumcapsulate::VariantDiscriminant`                                                                                                                                |
+| Derive macro          | Functionality                                                                                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AsVariant`           | Derives impls for `enumcapsulate::AsVariant<T>` for each variant type `T` where `T: Clone`                                                                                        |
+| `AsVariantMut`        | Derives impls for `enumcapsulate::AsVariantMut<T>` for each variant type `T`                                                                                                      |
+| `AsVariantRef`        | Derives impls for `enumcapsulate::AsVariantRef<T>` for each variant type `T`                                                                                                      |
+| `Encapsulate`         | Umbrella derive macro for `AsVariant`, `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `IsVariant`, `TryInto`, `VariantDiscriminant`, and `VariantDowncast` |
+| `From`                | Derives impls for `core::convert::From<T>` for each variant type `T`                                                                                                              |
+| `FromVariant`         | Derives impls for `enumcapsulate::FromVariant<T>` for each variant type `T`                                                                                                       |
+| `IntoVariant`         | Derives impls for `enumcapsulate::FromVariant<T>` for each variant type `T`                                                                                                       |
+| `IsVariant`           | Derives impl for `enumcapsulate::IsVariant`                                                                                                                                       |
+| `TryInto`             | Derives impls for `core::convert::TryInto<T>` for each variant type `T`                                                                                                           |
+| `VariantDiscriminant` | Derives impl for `enumcapsulate::VariantDiscriminant`                                                                                                                             |
 
 # Macro helper attributes
 

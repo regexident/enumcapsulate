@@ -13,17 +13,17 @@ Safe casting for newtype enums and their variants.
 
 The `enumcapsulate` crate exports the following traits:
 
-| Traits                | Functionality                                                                                                                                                                       |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AsVariant`           | Umbrella derive macro for `AsVariantRef`, and `AsVariantMut`                                                                                                                        |
-| `AsVariantMut`        | Used to do a cheap mutable-to-mutable reference conversion between an outer enum's and its inner variant's type                                                                     |
-| `AsVariantRef`        | Used to do a cheap reference-to-reference reference conversion between an outer enum's and its inner variant's type                                                                 |
-| `Encapsulate`         | Umbrella derive macro for `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `IsVariant`, `TryInto`, `VariantDiscriminant`, and `VariantDowncast` `AsVariantMut` |
-| `FromVariant`         | Used to do variant-to-enum conversions between an outer enum's and its inner variant's type                                                                                         |
-| `IntoVariant`         | Used to do enum-to-variant conversions between an outer enum's and its inner variant's type                                                                                         |
-| `IsVariant`           | Used to check type of an enum's inner variant's type                                                                                                                                |
-| `VariantDiscriminant` | Used to obtain an enum variant's discriminant                                                                                                                                       |
-| `VariantDowncast`     | Convenience umbrella trait utilizing `AsVariantRef`, `AsVariantMut`, and `IntoVariant`                                                                                              |
+| Traits                | Functionality                                                                                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AsVariant`           | Provides owned access to the current variant's field.                                                                                                                             |
+| `AsVariantMut`        | Provides mutable borrowed access to the current variant's field.                                                                                                                  |
+| `AsVariantRef`        | Provides borrowed access to the current variant's field.                                                                                                                          |
+| `Encapsulate`         | Umbrella derive macro for `AsVariant`, `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `IsVariant`, `TryInto`, `VariantDiscriminant`, and `VariantDowncast` |
+| `FromVariant`         | Creates an instance of `Self` from the unambiguous field type of one of its variants.                                                                                             |
+| `IntoVariant`         | Returns the current variant's field, consuming `self`.                                                                                                                            |
+| `IsVariant`           | Used to check type of an enum's inner variant's type                                                                                                                              |
+| `VariantDiscriminant` | Used to obtain an enum variant's discriminant                                                                                                                                     |
+| `VariantDowncast`     | Convenience umbrella trait utilizing `AsVariant`, `AsVariantRef`, `AsVariantMut`, and `IntoVariant`                                                                               |
 
 ## Derive macros
 
