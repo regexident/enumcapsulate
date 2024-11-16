@@ -1,6 +1,20 @@
-use enumcapsulate::{AsVariantMut, AsVariantRef, Encapsulate, IntoVariant};
+use enumcapsulate::{AsVariant, AsVariantMut, AsVariantRef, Encapsulate, IntoVariant};
 pub struct VariantA;
+#[automatically_derived]
+impl ::core::clone::Clone for VariantA {
+    #[inline]
+    fn clone(&self) -> VariantA {
+        VariantA
+    }
+}
 pub struct VariantB;
+#[automatically_derived]
+impl ::core::clone::Clone for VariantB {
+    #[inline]
+    fn clone(&self) -> VariantB {
+        VariantB
+    }
+}
 pub struct VariantC;
 pub struct VariantD;
 pub enum Enum {
@@ -43,6 +57,28 @@ impl ::enumcapsulate::FromVariant<VariantA> for Enum {
 impl ::enumcapsulate::FromVariant<VariantB> for Enum {
     fn from_variant(inner: VariantB) -> Self {
         Self::VariantB(inner)
+    }
+}
+impl ::enumcapsulate::AsVariant<VariantA> for Enum
+where
+    VariantA: Clone,
+{
+    fn as_variant(&self) -> Option<VariantA> {
+        match self {
+            Enum::VariantA(inner, ..) => Some(inner.clone()),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariant<VariantB> for Enum
+where
+    VariantB: Clone,
+{
+    fn as_variant(&self) -> Option<VariantB> {
+        match self {
+            Enum::VariantB(inner, ..) => Some(inner.clone()),
+            _ => None,
+        }
     }
 }
 impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
@@ -177,7 +213,8 @@ impl ::enumcapsulate::VariantDiscriminant for Enum {
 }
 fn check<T, U>()
 where
-    T: AsVariantRef<U> + AsVariantMut<U> + IntoVariant<U> + From<U> + TryInto<U>,
+    T: AsVariant<U> + AsVariantRef<U> + AsVariantMut<U> + IntoVariant<U> + From<U>
+        + TryInto<U>,
 {}
 fn main() {
     check::<Enum, VariantA>();

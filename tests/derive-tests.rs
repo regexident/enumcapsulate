@@ -34,6 +34,18 @@ mod from_variant {
     }
 }
 
+mod as_variant {
+    #[test]
+    pub fn pass() {
+        tryexpand::expand(["tests/derive-tests/as_variant/pass/**/*.rs"]).and_check();
+    }
+
+    #[test]
+    pub fn fail() {
+        tryexpand::expand(["tests/derive-tests/as_variant/fail/**/*.rs"]).expect_fail();
+    }
+}
+
 mod as_variant_ref {
     #[test]
     pub fn pass() {

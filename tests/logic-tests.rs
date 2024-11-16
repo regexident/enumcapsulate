@@ -86,6 +86,32 @@ mod into_variant {
     }
 }
 
+mod as_variant {
+    use enumcapsulate::AsVariant;
+
+    use super::*;
+
+    #[derive(PartialEq, Debug, AsVariant)]
+    enum Enum {
+        VariantA(VariantA),
+        VariantB(VariantB),
+    }
+
+    #[test]
+    fn returns_some_for_match() {
+        let subject: Enum = Enum::VariantA(VariantA);
+        let option: Option<VariantA> = subject.as_variant();
+        assert_eq!(option, Some(VariantA));
+    }
+
+    #[test]
+    fn returns_none_for_mismatch() {
+        let subject: Enum = Enum::VariantA(VariantA);
+        let option: Option<VariantB> = subject.as_variant();
+        assert_eq!(option, None);
+    }
+}
+
 mod as_variant_ref {
     use enumcapsulate::AsVariantRef;
 
@@ -134,32 +160,6 @@ mod as_variant_mut {
     fn returns_none_for_mismatch() {
         let mut subject: Enum = Enum::VariantA(VariantA);
         let option: Option<&mut VariantB> = subject.as_variant_mut();
-        assert_eq!(option, None);
-    }
-}
-
-mod as_variant {
-    use enumcapsulate::AsVariantRef;
-
-    use super::*;
-
-    #[derive(PartialEq, Debug, AsVariantRef)]
-    enum Enum {
-        VariantA(VariantA),
-        VariantB(VariantB),
-    }
-
-    #[test]
-    fn returns_some_for_match() {
-        let subject: Enum = Enum::VariantA(VariantA);
-        let option: Option<VariantA> = subject.as_variant();
-        assert_eq!(option, Some(VariantA));
-    }
-
-    #[test]
-    fn returns_none_for_mismatch() {
-        let subject: Enum = Enum::VariantA(VariantA);
-        let option: Option<VariantB> = subject.as_variant();
         assert_eq!(option, None);
     }
 }

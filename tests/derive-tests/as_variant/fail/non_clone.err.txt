@@ -1,0 +1,19 @@
+error: cannot find derive macro `AsVariant` in this scope
+   --> /tests/derive-tests/as_variant/fail/non_clone.rs:6:10
+    |
+6   | #[derive(AsVariant)]
+    |          ^^^^^^^^^
+    |
+   ::: /macros/src/lib.rs:199:1
+    |
+199 | pub fn derive_as_variant_ref(input: TokenStream) -> TokenStream {
+    | --------------------------------------------------------------- similarly named derive macro `AsVariantRef` defined here
+    |
+help: a derive macro with a similar name exists
+    |
+6   | #[derive(AsVariantRef)]
+    |          ~~~~~~~~~~~~
+help: consider importing this derive macro
+    |
+1   + use enumcapsulate::AsVariant;
+    |

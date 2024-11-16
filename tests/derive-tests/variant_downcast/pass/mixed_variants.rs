@@ -1,4 +1,4 @@
-use enumcapsulate::{AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast};
+use enumcapsulate::{AsVariant, AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast};
 
 #[derive(Clone)]
 pub struct VariantA;
@@ -9,7 +9,7 @@ pub struct VariantC;
 #[derive(Clone)]
 pub struct VariantD;
 
-#[derive(AsVariantRef, AsVariantMut, IntoVariant)]
+#[derive(AsVariant, AsVariantRef, AsVariantMut, IntoVariant)]
 pub enum Enum {
     Unit,
     ZeroTupleFields(),
