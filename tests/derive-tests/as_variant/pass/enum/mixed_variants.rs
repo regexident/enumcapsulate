@@ -4,12 +4,17 @@ use enumcapsulate::AsVariant;
 pub struct VariantA;
 #[derive(Clone)]
 pub struct VariantB;
+pub struct VariantC;
 
 #[derive(AsVariant)]
 pub enum Enum {
     Unit,
     OneTupleField(VariantA),
-    OneStructField { variant: VariantB },
+    OneStructField {
+        variant: VariantB,
+    },
+    #[enumcapsulate(exclude)]
+    OneExcludedTupleField(VariantA),
 }
 
 fn main() {

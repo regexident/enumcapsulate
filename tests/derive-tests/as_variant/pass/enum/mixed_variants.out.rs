@@ -15,10 +15,13 @@ impl ::core::clone::Clone for VariantB {
         VariantB
     }
 }
+pub struct VariantC;
 pub enum Enum {
     Unit,
     OneTupleField(VariantA),
     OneStructField { variant: VariantB },
+    #[enumcapsulate(exclude)]
+    OneExcludedTupleField(VariantA),
 }
 impl ::enumcapsulate::AsVariant<VariantA> for Enum
 where
