@@ -1,6 +1,8 @@
-use enumcapsulate::{AsVariantMut, AsVariantRef, Encapsulate, IntoVariant};
+use enumcapsulate::{AsVariant, AsVariantMut, AsVariantRef, Encapsulate, IntoVariant};
 
+#[derive(Clone)]
 pub struct VariantA;
+#[derive(Clone)]
 pub struct VariantB;
 pub struct VariantC;
 pub struct VariantD;
@@ -13,7 +15,7 @@ pub enum Enum {
 
 fn check<T, U>()
 where
-    T: AsVariantRef<U> + AsVariantMut<U> + IntoVariant<U> + From<U> + TryInto<U>,
+    T: AsVariant<U> + AsVariantRef<U> + AsVariantMut<U> + IntoVariant<U> + From<U> + TryInto<U>,
 {
 }
 

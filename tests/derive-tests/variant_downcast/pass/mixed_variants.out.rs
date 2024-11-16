@@ -1,4 +1,4 @@
-use enumcapsulate::{AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast};
+use enumcapsulate::{AsVariant, AsVariantMut, AsVariantRef, IntoVariant, VariantDowncast};
 pub struct VariantA;
 #[automatically_derived]
 impl ::core::clone::Clone for VariantA {
@@ -45,6 +45,50 @@ pub enum Enum {
     IncludedTuple(i8, VariantC),
     #[enumcapsulate(include(field = "variant"))]
     IncludedStruct { value: u8, variant: VariantD },
+}
+impl ::enumcapsulate::AsVariant<VariantA> for Enum
+where
+    VariantA: Clone,
+{
+    fn as_variant(&self) -> Option<VariantA> {
+        match self {
+            Enum::OneTupleField(inner, ..) => Some(inner.clone()),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariant<VariantB> for Enum
+where
+    VariantB: Clone,
+{
+    fn as_variant(&self) -> Option<VariantB> {
+        match self {
+            Enum::OneStructField { variant: inner, .. } => Some(inner.clone()),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariant<VariantC> for Enum
+where
+    VariantC: Clone,
+{
+    fn as_variant(&self) -> Option<VariantC> {
+        match self {
+            Enum::IncludedTuple(_, inner, ..) => Some(inner.clone()),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariant<VariantD> for Enum
+where
+    VariantD: Clone,
+{
+    fn as_variant(&self) -> Option<VariantD> {
+        match self {
+            Enum::IncludedStruct { variant: inner, .. } => Some(inner.clone()),
+            _ => None,
+        }
+    }
 }
 impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantA> {

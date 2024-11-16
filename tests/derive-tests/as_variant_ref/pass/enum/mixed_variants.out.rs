@@ -82,6 +82,4 @@ fn main() {
     let subject = Enum::Unit;
     let _: Option<&VariantA> = subject.as_variant_ref();
     let _: Option<&VariantB> = subject.as_variant_ref();
-    let _: Option<VariantA> = subject.as_variant();
-    let _: Option<VariantB> = subject.as_variant();
 }
