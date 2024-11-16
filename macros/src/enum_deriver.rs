@@ -203,6 +203,75 @@ impl EnumDeriver {
         })
     }
 
+    pub fn derive_as_variant(&self) -> Result<TokenStream2, syn::Error> {
+        let outer = &self.input.ident;
+        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+
+        let variants = self.variants()?;
+        let variant_infos: Vec<VariantInfo> = utils::variant_infos(variants)?;
+
+        let mut impls: Vec<TokenStream2> = vec![];
+
+        for variant_info in variant_infos {
+            let VariantInfo {
+                ident: inner,
+                attrs,
+                fields,
+            } = variant_info;
+
+            if attrs.exclude.is_some() {
+                continue;
+            }
+
+            let field_info = if let Some(include_info) = &attrs.include {
+                let index = include_info.field.index;
+                Some((index, &fields[index]))
+            } else if let [field_info] = &fields[..] {
+                Some((0, field_info))
+            } else {
+                None
+            };
+
+            let Some((
+                field_index,
+                FieldInfo {
+                    ident: inner_field,
+                    ty: inner_ty,
+                },
+            )) = field_info
+            else {
+                continue;
+            };
+
+            let pattern = match inner_field {
+                Some(inner_field) => quote! {
+                    #outer_ty::#inner { #inner_field: inner, .. }
+                },
+                None => {
+                    let underscores = (0..field_index).map(|_| quote! { _, });
+                    quote! {
+                        #outer_ty::#inner(#(#underscores)* inner, ..)
+                    }
+                }
+            };
+
+            impls.push(quote! {
+                impl ::enumcapsulate::AsVariant<#inner_ty> for #outer_ty where #inner_ty: Clone {
+                    fn as_variant(&self) -> Option<#inner_ty> {
+                        match self {
+                            #pattern => Some(inner.clone()),
+                            _ => None
+                        }
+                    }
+                }
+            });
+        }
+
+        Ok(quote! {
+            #(#impls)*
+        })
+    }
+
     pub fn derive_as_variant_ref(&self) -> Result<TokenStream2, syn::Error> {
         let outer = &self.input.ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
