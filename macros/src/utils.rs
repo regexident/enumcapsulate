@@ -6,22 +6,22 @@ use syn::{
 };
 
 #[derive(Default)]
-pub(crate) struct ExcludeAttr {}
+pub(crate) struct VariantExcludeAttr {}
 
 #[derive(Default)]
-pub(crate) struct IncludeFieldAttr {
+pub(crate) struct VariantIncludeFieldAttr {
     pub index: usize,
 }
 
 #[derive(Default)]
-pub(crate) struct IncludeAttr {
-    pub field: IncludeFieldAttr,
+pub(crate) struct VariantIncludeAttr {
+    pub field: VariantIncludeFieldAttr,
 }
 
 #[derive(Default)]
 pub(crate) struct VariantAttrs {
-    pub exclude: Option<ExcludeAttr>,
-    pub include: Option<IncludeAttr>,
+    pub exclude: Option<VariantExcludeAttr>,
+    pub include: Option<VariantIncludeAttr>,
 }
 
 pub(crate) struct FieldInfo<'a> {
@@ -40,15 +40,18 @@ const EXCLUDE_ATTR: &str = "exclude";
 const INCLUDE_ATTR: &str = "include";
 const FIELD_ATTR: &str = "field";
 
-fn ident(variant: &Variant) -> Result<Ident, Error> {
+fn variant_ident(variant: &Variant) -> Result<Ident, Error> {
     Ok(variant.ident.clone())
 }
 
-fn exclude_attr(_variant: &Variant, _meta: &ParseNestedMeta) -> Result<ExcludeAttr, Error> {
-    Ok(ExcludeAttr {})
+fn variant_exclude_attr(
+    _variant: &Variant,
+    _meta: &ParseNestedMeta,
+) -> Result<VariantExcludeAttr, Error> {
+    Ok(VariantExcludeAttr::default())
 }
 
-fn index_of_field_with_name(
+fn index_of_variant_field_with_name(
     variant: &Variant,
     name: &str,
     meta: &MetaNameValue,
@@ -76,7 +79,7 @@ fn index_of_field_with_name(
     }
 }
 
-fn index_of_field_with_index(
+fn index_of_variant_field_with_index(
     variant: &Variant,
     index: usize,
     meta: &MetaNameValue,
@@ -101,16 +104,19 @@ fn index_of_field_with_index(
     }
 }
 
-fn include_field_attr(variant: &Variant, meta: &MetaNameValue) -> Result<IncludeFieldAttr, Error> {
+fn variant_include_field_attr(
+    variant: &Variant,
+    meta: &MetaNameValue,
+) -> Result<VariantIncludeFieldAttr, Error> {
     match &meta.value {
         Expr::Lit(expr_lit) => match &expr_lit.lit {
             Lit::Str(lit) => {
-                let index = index_of_field_with_name(variant, &lit.value(), meta)?;
-                Ok(IncludeFieldAttr { index })
+                let index = index_of_variant_field_with_name(variant, &lit.value(), meta)?;
+                Ok(VariantIncludeFieldAttr { index })
             }
             Lit::Int(lit) => {
-                let index = index_of_field_with_index(variant, lit.base10_parse()?, meta)?;
-                Ok(IncludeFieldAttr { index })
+                let index = index_of_variant_field_with_index(variant, lit.base10_parse()?, meta)?;
+                Ok(VariantIncludeFieldAttr { index })
             }
             _ => Err(Error::new_spanned(
                 meta,
@@ -121,8 +127,11 @@ fn include_field_attr(variant: &Variant, meta: &MetaNameValue) -> Result<Include
     }
 }
 
-fn include_attr(variant: &Variant, meta: &ParseNestedMeta) -> Result<IncludeAttr, Error> {
-    let mut attr = IncludeAttr::default();
+fn variant_include_attr(
+    variant: &Variant,
+    meta: &ParseNestedMeta,
+) -> Result<VariantIncludeAttr, Error> {
+    let mut attr = VariantIncludeAttr::default();
     let content;
     syn::parenthesized!(content in meta.input);
 
@@ -134,7 +143,7 @@ fn include_attr(variant: &Variant, meta: &ParseNestedMeta) -> Result<IncludeAttr
             Meta::List(_) => return Err(Error::new_spanned(meta, "not supported!")),
             Meta::NameValue(name_value) => {
                 if name_value.path.is_ident(FIELD_ATTR) {
-                    attr.field = include_field_attr(variant, name_value)?;
+                    attr.field = variant_include_field_attr(variant, name_value)?;
                 } else {
                     return Err(Error::new_spanned(meta, "not supported!"));
                 }
@@ -145,7 +154,7 @@ fn include_attr(variant: &Variant, meta: &ParseNestedMeta) -> Result<IncludeAttr
     Ok(attr)
 }
 
-fn attrs(variant: &Variant) -> Result<VariantAttrs, Error> {
+fn variant_attrs(variant: &Variant) -> Result<VariantAttrs, Error> {
     let mut attrs = VariantAttrs::default();
 
     for attr in &variant.attrs {
@@ -155,10 +164,10 @@ fn attrs(variant: &Variant) -> Result<VariantAttrs, Error> {
 
         attr.parse_nested_meta(|meta| {
             if meta.path.is_ident(EXCLUDE_ATTR) {
-                attrs.exclude = Some(exclude_attr(variant, &meta)?);
+                attrs.exclude = Some(variant_exclude_attr(variant, &meta)?);
                 Ok(())
             } else if meta.path.is_ident(INCLUDE_ATTR) {
-                attrs.include = Some(include_attr(variant, &meta)?);
+                attrs.include = Some(variant_include_attr(variant, &meta)?);
                 Ok(())
             } else {
                 Err(meta.error("unsupported attribute"))
@@ -169,7 +178,7 @@ fn attrs(variant: &Variant) -> Result<VariantAttrs, Error> {
     Ok(attrs)
 }
 
-fn fields(variant: &Variant) -> Result<Vec<FieldInfo>, Error> {
+fn variant_fields(variant: &Variant) -> Result<Vec<FieldInfo>, Error> {
     let fields = match &variant.fields {
         Fields::Named(fields) => Vec::from_iter(fields.named.iter()),
         Fields::Unnamed(fields) => Vec::from_iter(fields.unnamed.iter()),
@@ -193,9 +202,9 @@ where
 
     for variant in variants {
         info.push(VariantInfo {
-            ident: ident(variant)?,
-            attrs: attrs(variant)?,
-            fields: fields(variant)?,
+            ident: variant_ident(variant)?,
+            attrs: variant_attrs(variant)?,
+            fields: variant_fields(variant)?,
         });
     }
 
