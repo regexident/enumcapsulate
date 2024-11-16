@@ -10,19 +10,18 @@ pub trait FromVariant<T> {
     fn from_variant(variant: T) -> Self;
 }
 
+/// Used to do a potentially expensive reference-to-value conversion
+/// between an outer enum's and its inner variant's type.
+pub trait AsVariant<T> {
+    /// Returns a clone of the inner value if it is of type `T`, or `None`` if it isn’t.
+    fn as_variant(&self) -> Option<T>;
+}
+
 /// Used to do a cheap reference-to-reference reference conversion
 /// between an outer enum's and its inner variant's type.
 pub trait AsVariantRef<T> {
     /// Returns some reference to the inner value if it is of type `T`, or `None`` if it isn’t.
     fn as_variant_ref(&self) -> Option<&T>;
-
-    /// Returns a copy of the inner value if it is of type `T`, or `None`` if it isn’t.
-    fn as_variant(&self) -> Option<T>
-    where
-        T: Clone,
-    {
-        self.as_variant_ref().cloned()
-    }
 }
 
 /// Used to do a cheap mutable-to-mutable reference conversion
@@ -68,7 +67,7 @@ pub trait VariantDowncast {
     fn as_variant_downcast<T>(&self) -> Option<T>
     where
         T: Clone,
-        Self: AsVariantRef<T>,
+        Self: AsVariant<T>,
     {
         self.as_variant()
     }

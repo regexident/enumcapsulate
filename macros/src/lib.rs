@@ -131,6 +131,47 @@ pub fn derive_from_variant(input: TokenStream) -> TokenStream {
 /// and `Outer` is the enclosing enum's type.
 ///
 /// ```ignore
+/// # use enumcapsulate::AsVariant;
+///
+/// #[derive(Clone)]
+/// struct Inner;
+///
+/// enum Outer {
+///     Inner(Inner),
+///     // ...
+/// }
+///
+/// // The generated impls look something along these lines:
+///
+/// impl AsVariant<Inner> for Outer where Inner: Clone {
+///     fn as_variant(&self) -> Option<Inner> {
+///         match self {
+///             Outer::Inner(inner) => Some(inner.clone()),
+///             _ => None,
+///         }
+///     }
+/// }
+///
+/// // ...
+/// ```
+///
+#[proc_macro_derive(AsVariant, attributes(enumcapsulate))]
+pub fn derive_as_variant(input: TokenStream) -> TokenStream {
+    let input: DeriveInput = parse_macro_input!(input);
+
+    tokenstream(|| {
+        let deriver = EnumDeriver::from(input);
+        deriver.derive_as_variant()
+    })
+}
+
+/// Derive macro generating an impl of the trait `FromVariant<T>`.
+///
+/// It generates an impl for each of the enum's
+/// newtype variants, where `Inner` is the variant's field type
+/// and `Outer` is the enclosing enum's type.
+///
+/// ```ignore
 /// # use enumcapsulate::AsVariantRef;
 ///
 /// struct Inner;
@@ -201,54 +242,6 @@ pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
     tokenstream(|| {
         let deriver = EnumDeriver::from(input);
         deriver.derive_as_variant_mut()
-    })
-}
-
-/// Derive macro generating an impl of the trait `AsVariant<T>`.
-///
-/// It generates an impl for each of the enum's
-/// newtype variants, where `Inner` is the variant's field type
-/// and `Outer` is the enclosing enum's type.
-///
-/// ```ignore
-/// # use enumcapsulate::AsVariant;
-///
-/// #[derive(Clone)]
-/// struct Inner;
-///
-/// enum Outer {
-///     Inner(Inner),
-///     // ...
-/// }
-///
-/// // The generated impls look something along these lines:
-///
-/// impl AsVariant<Inner> for Outer {
-///     fn as_variant(&self) -> Option<Inner> {
-///          match self {
-///             Outer::Inner(inner) => Some(inner.clone()),
-///             _ => None,
-///         }
-///     }
-/// }
-///
-/// // ...
-/// ```
-///
-#[proc_macro_derive(AsVariant, attributes(enumcapsulate))]
-pub fn derive_as_variant(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
-
-    tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
-
-        let as_variant_ref = deriver.derive_as_variant_ref()?;
-        let as_variant_mut = deriver.derive_as_variant_mut()?;
-
-        Ok(quote::quote! {
-            #as_variant_ref
-            #as_variant_mut
-        })
     })
 }
 
@@ -435,6 +428,7 @@ pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
         let from = deriver.derive_from()?;
         let try_into = deriver.derive_try_into()?;
         let from_variant = deriver.derive_from_variant()?;
+        let as_variant = deriver.derive_as_variant()?;
         let as_variant_ref = deriver.derive_as_variant_ref()?;
         let as_variant_mut = deriver.derive_as_variant_mut()?;
         let into_variant = deriver.derive_into_variant()?;
@@ -446,6 +440,7 @@ pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
             #from
             #try_into
             #from_variant
+            #as_variant
             #as_variant_ref
             #as_variant_mut
             #into_variant
