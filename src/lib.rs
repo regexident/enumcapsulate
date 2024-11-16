@@ -3,38 +3,33 @@
 #[cfg(feature = "macros")]
 pub use enumcapsulate_macros::*;
 
-/// Used to do variant-to-enum conversions
-/// between an outer enum's and its inner variant's type.
+/// Creates an instance of `Self` from the unambiguous field type of one of its variants.
 pub trait FromVariant<T> {
     /// Converts to this type from the variant's type.
     fn from_variant(variant: T) -> Self;
 }
 
-/// Used to do a potentially expensive reference-to-value conversion
-/// between an outer enum's and its inner variant's type.
+/// Provides owned access to the current variant's field.
 pub trait AsVariant<T> {
-    /// Returns a clone of the inner value if it is of type `T`, or `None`` if it isn’t.
+    /// Returns a the inner value as `T` if it is of type `T`, or `None` if it isn’t.
     fn as_variant(&self) -> Option<T>;
 }
 
-/// Used to do a cheap reference-to-reference reference conversion
-/// between an outer enum's and its inner variant's type.
+/// Provides borrowed access to the current variant's field.
 pub trait AsVariantRef<T> {
-    /// Returns some reference to the inner value if it is of type `T`, or `None`` if it isn’t.
+    /// Returns a the inner value as `&T` if it is of type `T`, or `None` if it isn’t.
     fn as_variant_ref(&self) -> Option<&T>;
 }
 
-/// Used to do a cheap mutable-to-mutable reference conversion
-/// between an outer enum's and its inner variant's type.
+/// Provides mutable borrowed access to the current variant's field.
 pub trait AsVariantMut<T> {
-    /// Returns some mutable reference to the inner value if it is of type `T`, or `None` if it isn’t.
+    /// Returns a the inner value as `&mut T` if it is of type `T`, or `None` if it isn’t.
     fn as_variant_mut(&mut self) -> Option<&mut T>;
 }
 
-/// Used to do enum-to-variant conversions
-/// between an outer enum's and its inner variant's type.
+/// Returns the current variant's field, consuming `self`.
 pub trait IntoVariant<T>: Sized {
-    /// Converts this type into the variant's type.
+    /// Returns the inner value if it is of type `T`, or `Err(self)` if it isn’t.
     fn into_variant(self) -> Result<T, Self>;
 }
 
