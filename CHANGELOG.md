@@ -20,13 +20,15 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
-- n/a
+- Added dedicated `trait AsVariant<T>` for `AsVariantRef<T>`'s removed `fn as_variant(&self) -> Option<T>`.
+- Added dedicated `AsVariant` derive macro for `trait AsVariant<T>`.
 
 ### Changed
 
 - Removed `enumcapsulate::macros` and its redundant `enumcapsulate::derive` module in favor of re-exporting its items directly from `crate::*`, thus eliminating the need for individually importing trait + derive macro pairs:
   - Before: `use enumcapsulate::{derive::FromVariant, FromVariant};`
   - After: `use enumcapsulate::FromVariant;`
+- Made `Encapsulate` derive macro derive also derive `AsVariant<T>`.
 
 ### Deprecated
 
@@ -34,7 +36,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Removed
 
-- n/a
+- Removed `fn as_variant(&self) -> Option<T>` default trait method from `AsVariantRef<T>` (see `Added` section for more info).
 
 ### Fixed
 
