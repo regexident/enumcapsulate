@@ -20,6 +20,40 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
+- n/a
+
+### Changed
+
+- n/a
+
+### Deprecated
+
+- n/a
+
+### Removed
+
+- n/a
+
+### Fixed
+
+- n/A
+
+### Performance
+
+- n/a
+
+### Security
+
+- n/a
+
+### Other
+
+- n/a
+
+## [0.4.0] - 2024-11-18
+
+### Added
+
 - Added dedicated `trait AsVariant<T>` for `AsVariantRef<T>`'s removed `fn as_variant(&self) -> Option<T>`.
 - Added dedicated `AsVariant` derive macro for `trait AsVariant<T>`.
 - Added enum-level `#[enumcapsulate(exclude)]`/`#[enumcapsulate(exclude(…))]` helper attribute.
@@ -37,30 +71,10 @@ Please make sure to add your changes to the appropriate categories:
   - `#[enumcapsulate(field(index = …))]`
   - `#[enumcapsulate(field(name = "…"))]`
 
-### Deprecated
-
-- n/a
-
 ### Removed
 
 - Removed `fn as_variant(&self) -> Option<T>` default trait method from `AsVariantRef<T>` (see `Added` section for more info).
 - Removed `IsVariant<T>` trait and corresponding `IsVariant` derive macro.
-
-### Fixed
-
-- n/A
-
-### Performance
-
-- n/a
-
-### Security
-
-- n/a
-
-### Other
-
-- n/a
 
 ## [0.3.0] - 2024-05-24
 
