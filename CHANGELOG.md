@@ -22,6 +22,9 @@ Please make sure to add your changes to the appropriate categories:
 
 - Added dedicated `trait AsVariant<T>` for `AsVariantRef<T>`'s removed `fn as_variant(&self) -> Option<T>`.
 - Added dedicated `AsVariant` derive macro for `trait AsVariant<T>`.
+- Added enum-level `#[enumcapsulate(exclude)]`/`#[enumcapsulate(exclude(…))]` helper attribute.
+- Added optional selection list to variant-level `#[enumcapsulate(exclude(…))]` helper attribute.
+- Added optional selection list to variant-level `#[enumcapsulate(include(…))]` helper attribute.
 
 ### Changed
 
@@ -29,6 +32,9 @@ Please make sure to add your changes to the appropriate categories:
   - Before: `use enumcapsulate::{derive::FromVariant, FromVariant};`
   - After: `use enumcapsulate::FromVariant;`
 - Made `Encapsulate` derive macro derive also derive `AsVariant<T>`.
+- Promoted `field` value of `include(field = …)` to its own top-level variant attribute with name/index variants:
+  - `#[enumcapsulate(field(index = …))]`
+  - `#[enumcapsulate(field(name = "…"))]`
 
 ### Deprecated
 
