@@ -43,6 +43,7 @@ Please make sure to add your changes to the appropriate categories:
 ### Removed
 
 - Removed `fn as_variant(&self) -> Option<T>` default trait method from `AsVariantRef<T>` (see `Added` section for more info).
+- Removed `IsVariant<T>` trait and corresponding `IsVariant` derive macro.
 
 ### Fixed
 
