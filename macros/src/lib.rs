@@ -3,10 +3,13 @@ use syn::{parse_macro_input, DeriveInput};
 
 use crate::utils::tokenstream;
 
-use self::enum_deriver::EnumDeriver;
-
+mod config;
 mod enum_deriver;
 mod utils;
+
+use config::*;
+use enum_deriver::*;
+use utils::*;
 
 /// Derive macro generating an impl of the trait `From<T>`.
 ///
