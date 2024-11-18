@@ -130,24 +130,6 @@ impl ::enumcapsulate::IntoVariant<VariantB> for Enum {
     }
 }
 impl ::enumcapsulate::VariantDowncast for Enum {}
-impl ::enumcapsulate::IsVariant for Enum {
-    fn is_variant<T>(&self) -> bool
-    where
-        T: 'static + ?Sized,
-    {
-        use ::std::any::TypeId;
-        #[inline]
-        pub fn type_id_of_val<T: 'static + ?Sized>(_val: &T) -> TypeId {
-            TypeId::of::<T>()
-        }
-        let type_id = TypeId::of::<T>();
-        match self {
-            Enum::VariantA(inner, ..) => type_id_of_val(inner) == type_id,
-            Enum::VariantB { b: inner, .. } => type_id_of_val(inner) == type_id,
-            _ => false,
-        }
-    }
-}
 pub enum EnumDiscriminant {
     VariantA,
     VariantB,

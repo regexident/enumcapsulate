@@ -317,45 +317,6 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
     })
 }
 
-/// Derive macro generating an impl of the trait `IsVariant`.
-///
-/// The generated impl looks something along these lines:
-///
-/// ```ignore
-/// struct Inner;
-///
-/// enum Outer {
-///     Inner(Inner),
-///     // ...
-/// }
-///
-/// // The generated impls look something along these lines:
-///
-/// impl IsVariant for Outer {
-///     fn is_variant<T>(&self) -> bool
-///     where
-///         T: 'static + ?Sized
-///     {
-///         match self {
-///            Outer::Inner(inner) => /* ... */,
-///            // ...
-///        }
-///     }
-/// }
-///
-/// // ...
-/// ```
-///
-#[proc_macro_derive(IsVariant, attributes(enumcapsulate))]
-pub fn derive_is_variant(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
-
-    tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
-        deriver.derive_is_variant()
-    })
-}
-
 /// Derive macro generating an impl of the trait `VariantDiscriminant`.
 ///
 /// ```ignore
@@ -416,7 +377,7 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 /// ```ignore
 /// // ...
 ///
-/// #[derive(From, TryInto, FromVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast, IsVariant, VariantDiscriminant)]
+/// #[derive(From, TryInto, FromVariant, AsVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast, VariantDiscriminant)]
 /// enum Outer {
 ///     // ...
 /// }
@@ -436,7 +397,6 @@ pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
         let as_variant_mut = deriver.derive_as_variant_mut()?;
         let into_variant = deriver.derive_into_variant()?;
         let variant_downcast = deriver.derive_variant_downcast()?;
-        let is_variant = deriver.derive_is_variant()?;
         let variant_discriminant = deriver.derive_variant_discriminant()?;
 
         Ok(quote::quote! {
@@ -448,7 +408,6 @@ pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
             #as_variant_mut
             #into_variant
             #variant_downcast
-            #is_variant
             #variant_discriminant
         })
     })

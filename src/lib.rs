@@ -76,14 +76,6 @@ pub trait VariantDowncast {
     }
 }
 
-/// Used to check type of an enum's inner variant's type.
-pub trait IsVariant {
-    /// Returns `true` if `T` matches the variant's type, otherwise `false`.
-    fn is_variant<T>(&self) -> bool
-    where
-        T: 'static + ?Sized;
-}
-
 /// Used to obtain an enum variant's discriminant.
 pub trait VariantDiscriminant {
     type Discriminant: Eq;

@@ -10,7 +10,6 @@ static RECOGNIZED_ENUM_LEVEL_MACROS: &[&str] = &[
     macro_name::AS_VARIANT,
     macro_name::AS_VARIANT_REF,
     macro_name::AS_VARIANT_MUT,
-    macro_name::IS_VARIANT,
     macro_name::VARIANT_DISCRIMINANT,
     macro_name::VARIANT_DOWNCAST,
 ];

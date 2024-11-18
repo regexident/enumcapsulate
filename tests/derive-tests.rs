@@ -94,15 +94,6 @@ mod variant_downcast {
     }
 }
 
-mod is_variant {
-    #[test]
-    pub fn pass() {
-        tryexpand::expand(["tests/derive-tests/is_variant/pass/**/*.rs"]).and_check();
-    }
-
-    // There should be no failures for this derive macro;
-}
-
 mod variant_discriminant {
     #[test]
     pub fn pass() {
