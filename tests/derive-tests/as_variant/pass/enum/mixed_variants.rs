@@ -14,7 +14,7 @@ pub enum Enum {
         variant: VariantB,
     },
     #[enumcapsulate(exclude)]
-    OneExcludedTupleField(VariantA),
+    Excluded(VariantA, VariantB),
 }
 
 fn main() {

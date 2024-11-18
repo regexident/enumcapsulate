@@ -1,4 +1,6 @@
-use enumcapsulate::{AsVariant, AsVariantMut, AsVariantRef, Encapsulate, IntoVariant};
+use enumcapsulate::{
+    AsVariant, AsVariantMut, AsVariantRef, Encapsulate, FromVariant, IntoVariant,
+};
 pub struct VariantA;
 #[automatically_derived]
 impl ::core::clone::Clone for VariantA {
@@ -15,11 +17,9 @@ impl ::core::clone::Clone for VariantB {
         VariantB
     }
 }
-pub struct VariantC;
-pub struct VariantD;
 pub enum Enum {
     VariantA(VariantA),
-    VariantB(VariantB),
+    VariantB { b: VariantB },
 }
 impl ::core::convert::From<VariantA> for Enum {
     fn from(inner: VariantA) -> Self {
@@ -28,7 +28,7 @@ impl ::core::convert::From<VariantA> for Enum {
 }
 impl ::core::convert::From<VariantB> for Enum {
     fn from(inner: VariantB) -> Self {
-        Self::VariantB(inner)
+        Self::VariantB { b: inner }
     }
 }
 impl ::core::convert::TryFrom<Enum> for VariantA {
@@ -44,7 +44,7 @@ impl ::core::convert::TryFrom<Enum> for VariantB {
     type Error = Enum;
     fn try_from(outer: Enum) -> Result<Self, Self::Error> {
         match outer {
-            Enum::VariantB(inner, ..) => Ok(inner),
+            Enum::VariantB { b: inner, .. } => Ok(inner),
             err => Err(err),
         }
     }
@@ -56,7 +56,7 @@ impl ::enumcapsulate::FromVariant<VariantA> for Enum {
 }
 impl ::enumcapsulate::FromVariant<VariantB> for Enum {
     fn from_variant(inner: VariantB) -> Self {
-        Self::VariantB(inner)
+        Self::VariantB { b: inner }
     }
 }
 impl ::enumcapsulate::AsVariant<VariantA> for Enum
@@ -76,7 +76,7 @@ where
 {
     fn as_variant(&self) -> Option<VariantB> {
         match self {
-            Enum::VariantB(inner, ..) => Some(inner.clone()),
+            Enum::VariantB { b: inner, .. } => Some(inner.clone()),
             _ => None,
         }
     }
@@ -92,7 +92,7 @@ impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantRef<VariantB> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantB> {
         match self {
-            Enum::VariantB(inner, ..) => Some(inner),
+            Enum::VariantB { b: inner, .. } => Some(inner),
             _ => None,
         }
     }
@@ -108,7 +108,7 @@ impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantMut<VariantB> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantB> {
         match self {
-            Enum::VariantB(inner, ..) => Some(inner),
+            Enum::VariantB { b: inner, .. } => Some(inner),
             _ => None,
         }
     }
@@ -124,7 +124,7 @@ impl ::enumcapsulate::IntoVariant<VariantA> for Enum {
 impl ::enumcapsulate::IntoVariant<VariantB> for Enum {
     fn into_variant(self) -> Result<VariantB, Self> {
         match self {
-            Enum::VariantB(inner, ..) => Ok(inner),
+            Enum::VariantB { b: inner, .. } => Ok(inner),
             err => Err(err),
         }
     }
@@ -143,7 +143,7 @@ impl ::enumcapsulate::IsVariant for Enum {
         let type_id = TypeId::of::<T>();
         match self {
             Enum::VariantA(inner, ..) => type_id_of_val(inner) == type_id,
-            Enum::VariantB(inner, ..) => type_id_of_val(inner) == type_id,
+            Enum::VariantB { b: inner, .. } => type_id_of_val(inner) == type_id,
             _ => false,
         }
     }
@@ -206,15 +206,15 @@ impl ::enumcapsulate::VariantDiscriminant for Enum {
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {
             Enum::VariantA(..) => EnumDiscriminant::VariantA,
-            Enum::VariantB(..) => EnumDiscriminant::VariantB,
+            Enum::VariantB { .. } => EnumDiscriminant::VariantB,
             _ => ::core::panicking::panic("internal error: entered unreachable code"),
         }
     }
 }
 fn check<T, U>()
 where
-    T: AsVariant<U> + AsVariantRef<U> + AsVariantMut<U> + IntoVariant<U> + From<U>
-        + TryInto<U>,
+    T: FromVariant<U> + IntoVariant<U> + From<U> + TryInto<U> + AsVariant<U>
+        + AsVariantRef<U> + AsVariantMut<U>,
 {}
 fn main() {
     check::<Enum, VariantA>();

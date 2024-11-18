@@ -9,13 +9,15 @@ pub enum Enum {
     ZeroStructFields {},
     OneTupleField(VariantA),
     OneStructField { variant: VariantB },
+    #[enumcapsulate(exclude)]
     TwoTupleFields(i32, u32),
+    #[enumcapsulate(exclude)]
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
-    Excluded(bool),
-    #[enumcapsulate(include(field = 1))]
+    Excluded(VariantA, VariantB),
+    #[enumcapsulate(field(index = 1))]
     IncludedTuple(i8, VariantC),
-    #[enumcapsulate(include(field = "variant"))]
+    #[enumcapsulate(field(name = "variant"))]
     IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::core::convert::TryFrom<Enum> for VariantA {

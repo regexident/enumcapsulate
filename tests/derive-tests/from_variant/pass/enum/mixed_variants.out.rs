@@ -9,13 +9,15 @@ pub enum Enum {
     ZeroStructFields {},
     OneTupleField(VariantA),
     OneStructField { variant: VariantB },
+    #[enumcapsulate(exclude)]
     TwoTupleFields(i32, u32),
+    #[enumcapsulate(exclude)]
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
-    Excluded(bool),
-    #[enumcapsulate(include(field = 1))]
+    Excluded(VariantA, VariantB),
+    #[enumcapsulate(field(index = 1))]
     IncludedTuple(i8, VariantC),
-    #[enumcapsulate(include(field = "variant"))]
+    #[enumcapsulate(field(name = "variant"))]
     IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::enumcapsulate::FromVariant<VariantA> for Enum {
@@ -26,6 +28,19 @@ impl ::enumcapsulate::FromVariant<VariantA> for Enum {
 impl ::enumcapsulate::FromVariant<VariantB> for Enum {
     fn from_variant(inner: VariantB) -> Self {
         Self::OneStructField {
+            variant: inner,
+        }
+    }
+}
+impl ::enumcapsulate::FromVariant<VariantC> for Enum {
+    fn from_variant(inner: VariantC) -> Self {
+        Self::IncludedTuple(Default::default(), inner)
+    }
+}
+impl ::enumcapsulate::FromVariant<VariantD> for Enum {
+    fn from_variant(inner: VariantD) -> Self {
+        Self::IncludedStruct {
+            value: Default::default(),
             variant: inner,
         }
     }
