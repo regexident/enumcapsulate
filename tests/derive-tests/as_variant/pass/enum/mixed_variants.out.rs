@@ -21,7 +21,7 @@ pub enum Enum {
     OneTupleField(VariantA),
     OneStructField { variant: VariantB },
     #[enumcapsulate(exclude)]
-    OneExcludedTupleField(VariantA),
+    Excluded(VariantA, VariantB),
 }
 impl ::enumcapsulate::AsVariant<VariantA> for Enum
 where
