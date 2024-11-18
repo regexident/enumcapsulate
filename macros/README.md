@@ -22,7 +22,6 @@ The `enumcapsulate-macros` proc-macro crate exports the following derive macros:
 | `AsVariant`           | Derives impls for `Self: enumcapsulate::AsVariant<T>` for each non-unit variant type `T`.    |
 | `AsVariantMut`        | Derives impls for `Self: enumcapsulate::AsVariantMut<T>` for each non-unit variant type `T`. |
 | `AsVariantRef`        | Derives impls for `Self: enumcapsulate::AsVariantRef<T>` for each non-unit variant type `T`. |
-| `IsVariant`           | Derives impl for `enumcapsulate::IsVariant`.                                                 |
 | `VariantDiscriminant` | Derives impl for `Self: enumcapsulate::VariantDiscriminant`.                                 |
 
 … as well as an umbrella derive macro `Encapsulate`.
@@ -32,7 +31,7 @@ The `enumcapsulate-macros` proc-macro crate exports the following derive macros:
 
 ### `#[derive(Encapsulate)]`
 
-The umbrella derive macro `Encapsulate` allows for conveniently deriving `AsVariant`, `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `IsVariant`, `TryInto`, `VariantDiscriminant`, and `VariantDowncast` all at once.
+The umbrella derive macro `Encapsulate` allows for conveniently deriving `AsVariant`, `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `TryInto`, `VariantDiscriminant`, and `VariantDowncast` all at once.
 
 The following two snippets are semantically equivalent:
 
@@ -50,7 +49,6 @@ enum Enum { /* ... */ }
     AsVariant,
     AsVariantMut,
     AsVariantRef,
-    IsVariant,
     VariantDiscriminant,
 )]
 enum Enum { /* ... */ }

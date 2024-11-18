@@ -23,7 +23,6 @@ pub(crate) mod macro_name {
     pub(crate) const AS_VARIANT_REF: &str = "AsVariantRef";
     pub(crate) const AS_VARIANT_MUT: &str = "AsVariantMut";
 
-    pub(crate) const IS_VARIANT: &str = "IsVariant";
     pub(crate) const VARIANT_DISCRIMINANT: &str = "VariantDiscriminant";
     pub(crate) const VARIANT_DOWNCAST: &str = "VariantDowncast";
 }
