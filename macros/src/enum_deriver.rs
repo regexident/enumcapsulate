@@ -379,6 +379,7 @@ impl EnumDeriver {
             if self.uses_generic_const_or_type(inner_ty) {
                 continue;
             }
+
             let pattern = match &variant.fields {
                 Fields::Named(_) => {
                     let field = inner_ident;
