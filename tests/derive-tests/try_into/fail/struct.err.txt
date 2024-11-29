@@ -1,5 +1,5 @@
-error: Only enums can use this derive
- --> /tests/derive-tests/try_into/fail/struct.rs:4:12
+error: expected `enum`
+ --> /tests/derive-tests/try_into/fail/struct.rs:4:5
   |
 4 | pub struct Struct {
-  |            ^^^^^^
+  |     ^^^^^^

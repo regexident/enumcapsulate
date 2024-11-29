@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, DeriveInput};
+use syn::parse_macro_input;
 
 use crate::utils::tokenstream;
 
@@ -8,10 +8,7 @@ mod enum_deriver;
 mod type_visitor;
 mod utils;
 
-use config::*;
-use enum_deriver::*;
-use type_visitor::*;
-use utils::*;
+use self::{config::*, enum_deriver::*, type_visitor::*, utils::*};
 
 /// Derive macro generating an impl of the trait `From<T>`.
 ///
@@ -40,10 +37,10 @@ use utils::*;
 ///
 #[proc_macro_derive(From, attributes(enumcapsulate))]
 pub fn derive_from(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_from()
     })
 }
@@ -84,10 +81,10 @@ pub fn derive_from(input: TokenStream) -> TokenStream {
 /// more appropriate as the derive's name.
 #[proc_macro_derive(TryInto, attributes(enumcapsulate))]
 pub fn derive_try_from(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_try_into()
     })
 }
@@ -121,10 +118,10 @@ pub fn derive_try_from(input: TokenStream) -> TokenStream {
 ///
 #[proc_macro_derive(FromVariant, attributes(enumcapsulate))]
 pub fn derive_from_variant(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_from_variant()
     })
 }
@@ -162,10 +159,10 @@ pub fn derive_from_variant(input: TokenStream) -> TokenStream {
 ///
 #[proc_macro_derive(AsVariant, attributes(enumcapsulate))]
 pub fn derive_as_variant(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_as_variant()
     })
 }
@@ -202,10 +199,10 @@ pub fn derive_as_variant(input: TokenStream) -> TokenStream {
 ///
 #[proc_macro_derive(AsVariantRef, attributes(enumcapsulate))]
 pub fn derive_as_variant_ref(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_as_variant_ref()
     })
 }
@@ -242,10 +239,10 @@ pub fn derive_as_variant_ref(input: TokenStream) -> TokenStream {
 ///
 #[proc_macro_derive(AsVariantMut, attributes(enumcapsulate))]
 pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_as_variant_mut()
     })
 }
@@ -286,10 +283,10 @@ pub fn derive_as_variant_mut(input: TokenStream) -> TokenStream {
 /// more appropriate as the derive's name.
 #[proc_macro_derive(IntoVariant, attributes(enumcapsulate))]
 pub fn derive_into_variant(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_into_variant()
     })
 }
@@ -311,10 +308,10 @@ pub fn derive_into_variant(input: TokenStream) -> TokenStream {
 ///
 #[proc_macro_derive(VariantDowncast, attributes(enumcapsulate))]
 pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_variant_downcast()
     })
 }
@@ -353,10 +350,10 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
 ///
 #[proc_macro_derive(VariantDiscriminant)]
 pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
         deriver.derive_variant_discriminant()
     })
 }
@@ -386,10 +383,10 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_derive(Encapsulate, attributes(enumcapsulate))]
 pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let item = parse_macro_input!(input as syn::ItemEnum);
 
     tokenstream(|| {
-        let deriver = EnumDeriver::from(input);
+        let deriver = EnumDeriver::from(item);
 
         let from = deriver.derive_from()?;
         let try_into = deriver.derive_try_into()?;

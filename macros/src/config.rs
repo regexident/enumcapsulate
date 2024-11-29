@@ -30,31 +30,57 @@ pub(crate) enum VariantFieldConfig {
     Index(usize),
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, PartialEq, Eq, Debug)]
+pub(crate) struct MacroSelectionConfig {
+    pub idents: Vec<syn::Ident>,
+}
+
+impl MacroSelectionConfig {
+    pub fn is_empty(&self) -> bool {
+        self.idents.is_empty()
+    }
+
+    pub fn contains(&self, name: &str) -> bool {
+        self.idents.iter().any(|ident| ident == name)
+    }
+
+    pub fn extend_idents(&mut self, iter: impl IntoIterator<Item = syn::Ident>) {
+        self.idents.extend(iter);
+    }
+
+    pub(crate) fn idents(&self) -> &[syn::Ident] {
+        &self.idents
+    }
+}
+
+pub(crate) type EnumExcludeConfig = MacroSelectionConfig;
+pub(crate) type VariantExcludeConfig = MacroSelectionConfig;
+pub(crate) type VariantIncludeConfig = MacroSelectionConfig;
+
+#[derive(Clone, Default)]
 pub(crate) struct EnumConfig {
     // #[enumcapsulate(exclude(…))]
-    pub exclude: Option<Vec<syn::Ident>>,
+    pub exclude: Option<EnumExcludeConfig>,
 }
 
 impl EnumConfig {
     pub fn is_excluded(&self, name: &str) -> bool {
-        if let Some(excluded) = &self.exclude {
-            return excluded.iter().any(|ident| ident == name);
-        } else {
-            false
-        }
+        self.exclude
+            .as_ref()
+            .map(|excluded| excluded.contains(name))
+            .unwrap_or(false)
     }
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default)]
 pub(crate) struct VariantConfig {
     // #[enumcapsulate(exclude(…))]
-    pub exclude: Option<Vec<syn::Ident>>,
+    pub exclude: Option<VariantExcludeConfig>,
 
     // #[enumcapsulate(include(…))]
-    pub include: Option<Vec<syn::Ident>>,
+    pub include: Option<VariantIncludeConfig>,
 
-    // #[enumcapsulate(field(… = …))]
+    // #[enumcapsulate(field(…))]
     pub field: Option<VariantFieldConfig>,
 }
 
@@ -73,49 +99,48 @@ impl VariantConfig {
     }
 
     pub fn is_excluded_explicitly(&self, name: &str) -> bool {
-        if let Some(excluded) = &self.exclude {
-            if excluded.is_empty() {
-                if let Some(included) = &self.include {
-                    return !included.iter().any(|ident| ident == name);
-                } else {
-                    return true;
-                }
-            }
+        let Some(excluded) = &self.exclude else {
+            return false;
+        };
 
-            excluded.iter().any(|ident| ident == name)
-        } else {
-            false
+        if excluded.is_empty() {
+            if let Some(included) = &self.include {
+                return !included.contains(name);
+            } else {
+                return true;
+            }
         }
+
+        excluded.contains(name)
     }
 
     pub fn is_included_explicitly(&self, name: &str) -> bool {
-        if let Some(included) = &self.include {
-            if included.is_empty() {
-                if let Some(excluded) = &self.exclude {
-                    return !excluded.iter().any(|ident| ident == name);
-                } else {
-                    return true;
-                }
-            }
+        let Some(included) = &self.include else {
+            return false;
+        };
 
-            included.iter().any(|ident| ident == name)
-        } else {
-            false
+        if included.is_empty() {
+            if let Some(excluded) = &self.exclude {
+                return !excluded.contains(name);
+            } else {
+                return true;
+            }
         }
+
+        included.contains(name)
     }
 }
 
-pub(crate) fn config_for_enum_with_attrs(
-    enum_attrs: &[syn::Attribute],
-) -> Result<EnumConfig, syn::Error> {
+pub(crate) fn config_for_enum(enum_item: &syn::ItemEnum) -> Result<EnumConfig, syn::Error> {
     let mut config = EnumConfig::default();
 
-    parse_enumcapsulate_attrs(enum_attrs, |meta| {
+    parse_enumcapsulate_attrs(&enum_item.attrs, |meta| {
         if meta.path.is_ident(attr::EXCLUDE) {
             // #[enumcapsulate(exclude(…))]
 
             let mut exclude = config.exclude.take().unwrap_or_default();
-            exclude.extend(macro_idents_for_enum(&meta)?.into_iter());
+            exclude.extend_idents(macro_selection_config_for_enum(&meta)?.idents);
+
             config.exclude = Some(exclude);
         } else {
             return Err(meta.error("unrecognized attribute"));
@@ -141,17 +166,19 @@ pub(crate) fn config_for_variant(variant: &syn::Variant) -> Result<VariantConfig
             // #[enumcapsulate(exclude(…))]
 
             let mut exclude = config.exclude.take().unwrap_or_default();
-            let conflicting = config.include.as_deref().unwrap_or(&[]);
 
-            exclude.extend(macro_idents_for_variant(&meta, conflicting)?.into_iter());
+            let opposite = config.include.as_ref();
+            exclude.extend_idents(macro_selection_config_for_variant(&meta, opposite)?.idents);
+
             config.exclude = Some(exclude);
         } else if meta.path.is_ident(attr::INCLUDE) {
             // #[enumcapsulate(include(…))]
 
             let mut include = config.include.take().unwrap_or_default();
-            let conflicting = config.exclude.as_deref().unwrap_or(&[]);
 
-            include.extend(macro_idents_for_variant(&meta, conflicting)?.into_iter());
+            let opposite: Option<&MacroSelectionConfig> = config.exclude.as_ref();
+            include.extend_idents(macro_selection_config_for_variant(&meta, opposite)?.idents);
+
             config.include = Some(include);
         } else if meta.path.is_ident(attr::FIELD) {
             // #[enumcapsulate(field(…))]
@@ -233,29 +260,30 @@ pub(crate) fn parse_enumcapsulate_attrs(
     Ok(())
 }
 
-pub(crate) fn macro_idents_for_enum(
+pub(crate) fn macro_selection_config_for_enum(
     meta: &syn::meta::ParseNestedMeta<'_>,
-) -> Result<Vec<syn::Ident>, syn::Error> {
+) -> Result<MacroSelectionConfig, syn::Error> {
     let idents = parse_idents_from_meta_list(meta)?;
 
     let recognized = RECOGNIZED_ENUM_LEVEL_MACROS;
     ensure_only_recognized_ident_names(&idents, recognized)?;
 
-    Ok(idents)
+    Ok(MacroSelectionConfig { idents })
 }
 
-pub(crate) fn macro_idents_for_variant(
+pub(crate) fn macro_selection_config_for_variant(
     meta: &syn::meta::ParseNestedMeta<'_>,
-    conflict_list: &[syn::Ident],
-) -> Result<Vec<syn::Ident>, syn::Error> {
+    opposite: Option<&MacroSelectionConfig>,
+) -> Result<MacroSelectionConfig, syn::Error> {
     let idents = parse_idents_from_meta_list(meta)?;
 
     let recognized = RECOGNIZED_VARIANT_LEVEL_MACROS;
     ensure_only_recognized_ident_names(&idents, recognized)?;
 
+    let conflict_list = opposite.map(|config| config.idents()).unwrap_or(&[]);
     ensure_no_conflicting_idents(&idents, conflict_list)?;
 
-    Ok(idents)
+    Ok(MacroSelectionConfig { idents })
 }
 
 pub(crate) fn ensure_only_recognized_ident_names(
