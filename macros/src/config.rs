@@ -64,6 +64,10 @@ pub(crate) struct EnumConfig {
 }
 
 impl EnumConfig {
+    pub fn is_included(&self, name: &str) -> bool {
+        !self.is_excluded(name)
+    }
+
     pub fn is_excluded(&self, name: &str) -> bool {
         self.exclude
             .as_ref()
