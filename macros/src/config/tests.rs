@@ -1,8 +1,8 @@
 use syn::parse_quote;
 
-mod macro_idents {
-    use crate::config::*;
+use crate::config::*;
 
+mod macro_idents {
     use super::*;
 
     #[test]
@@ -118,15 +118,15 @@ mod macro_idents {
 }
 
 mod enum_config {
-    use syn::parse_quote;
-
-    use crate::{config_for_enum_with_attrs, EnumConfig};
+    use super::*;
 
     #[test]
     fn accepts_empty_attrs() -> Result<(), syn::Error> {
-        let attrs: Vec<syn::Attribute> = parse_quote! {};
+        let item: syn::ItemEnum = parse_quote! {
+            enum Dummy {}
+        };
 
-        let config = config_for_enum_with_attrs(&attrs)?;
+        let config = config_for_enum(&item)?;
 
         assert_eq!(config.exclude, None);
 
@@ -135,43 +135,47 @@ mod enum_config {
 
     #[test]
     fn accepts_empty_exclude_attrs() -> Result<(), syn::Error> {
-        let attrs: Vec<syn::Attribute> = parse_quote! {
+        let item: syn::ItemEnum = parse_quote! {
             #[enumcapsulate(exclude)]
+            enum Dummy {}
         };
 
-        let config = config_for_enum_with_attrs(&attrs)?;
+        let config = config_for_enum(&item)?;
 
-        assert_eq!(config.exclude, Some(vec![]));
+        let actual: Vec<syn::Ident> = config.exclude.unwrap().idents;
+        let expected: Vec<syn::Ident> = vec![];
+
+        assert_eq!(actual, expected);
 
         Ok(())
     }
 
     #[test]
     fn accepts_non_empty_exclude_attrs() -> Result<(), syn::Error> {
-        let attrs: Vec<syn::Attribute> = parse_quote! {
+        let item: syn::ItemEnum = parse_quote! {
             #[enumcapsulate(exclude(AsVariant, IntoVariant))]
+            enum Dummy {}
         };
 
-        let config = config_for_enum_with_attrs(&attrs)?;
+        let config = config_for_enum(&item)?;
 
-        assert_eq!(
-            config.exclude,
-            Some(vec![
-                parse_quote! { AsVariant },
-                parse_quote! { IntoVariant }
-            ])
-        );
+        let actual = config.exclude.unwrap().idents;
+        let expected: Vec<syn::Ident> =
+            vec![parse_quote! { AsVariant }, parse_quote! { IntoVariant }];
+
+        assert_eq!(actual, expected);
 
         Ok(())
     }
 
     #[test]
     fn rejects_unrecognized_exclude_attrs() -> Result<(), syn::Error> {
-        let attrs: Vec<syn::Attribute> = parse_quote! {
+        let item: syn::ItemEnum = parse_quote! {
             #[enumcapsulate(exclude(IntoVariant, Unrecognized))]
+            enum Dummy {}
         };
 
-        let error = config_for_enum_with_attrs(&attrs).err().unwrap();
+        let error = config_for_enum(&item).err().unwrap();
 
         assert_eq!(error.to_string(), "unrecognized macro derive");
 
@@ -181,10 +185,9 @@ mod enum_config {
     #[test]
     fn is_excluded() {
         let config = EnumConfig {
-            exclude: Some(vec![
-                parse_quote! { FromVariant },
-                parse_quote! { IntoVariant },
-            ]),
+            exclude: Some(MacroSelectionConfig {
+                idents: vec![parse_quote! { FromVariant }, parse_quote! { IntoVariant }],
+            }),
         };
 
         assert_eq!(config.is_excluded("FromVariant"), true);
@@ -194,9 +197,7 @@ mod enum_config {
 }
 
 mod variant_config {
-    use syn::parse_quote;
-
-    use crate::{config_for_variant, EnumConfig, VariantConfig, VariantFieldConfig};
+    use super::*;
 
     #[test]
     fn accepts_empty_attrs() -> Result<(), syn::Error> {
@@ -330,8 +331,14 @@ mod variant_config {
 
         let config = config_for_variant(&variant)?;
 
-        assert_eq!(config.exclude, Some(vec![]));
-        assert_eq!(config.include, Some(vec![]));
+        assert_eq!(
+            config.exclude.unwrap(),
+            MacroSelectionConfig { idents: vec![] }
+        );
+        assert_eq!(
+            config.include.unwrap(),
+            MacroSelectionConfig { idents: vec![] }
+        );
         assert_eq!(config.field, None);
 
         Ok(())
@@ -348,15 +355,16 @@ mod variant_config {
         let config = config_for_variant(&variant)?;
 
         assert_eq!(
-            config.exclude,
-            Some(vec![parse_quote! { From }, parse_quote! { TryInto }])
+            config.exclude.unwrap(),
+            MacroSelectionConfig {
+                idents: vec![parse_quote! { From }, parse_quote! { TryInto }]
+            }
         );
         assert_eq!(
-            config.include,
-            Some(vec![
-                parse_quote! { FromVariant },
-                parse_quote! { IntoVariant }
-            ])
+            config.include.unwrap(),
+            MacroSelectionConfig {
+                idents: vec![parse_quote! { FromVariant }, parse_quote! { IntoVariant }]
+            }
         );
 
         Ok(())
@@ -426,7 +434,9 @@ mod variant_config {
         #[test]
         fn only_enum_excludes() {
             let enum_config = EnumConfig {
-                exclude: Some(vec![parse_quote! { AsVariant }]),
+                exclude: Some(MacroSelectionConfig {
+                    idents: vec![parse_quote! { AsVariant }],
+                }),
             };
 
             let config = VariantConfig {
@@ -443,12 +453,14 @@ mod variant_config {
         #[test]
         fn blanket_overridden_enum_excludes() {
             let enum_config = EnumConfig {
-                exclude: Some(vec![parse_quote! { AsVariant }]),
+                exclude: Some(MacroSelectionConfig {
+                    idents: vec![parse_quote! { AsVariant }],
+                }),
             };
 
             let config = VariantConfig {
                 exclude: None,
-                include: Some(vec![]),
+                include: Some(MacroSelectionConfig { idents: vec![] }),
                 field: None,
             };
 
@@ -460,15 +472,16 @@ mod variant_config {
         #[test]
         fn selective_overridden_enum_excludes() {
             let enum_config = EnumConfig {
-                exclude: Some(vec![
-                    parse_quote! { AsVariant },
-                    parse_quote! { IntoVariant },
-                ]),
+                exclude: Some(MacroSelectionConfig {
+                    idents: vec![parse_quote! { AsVariant }, parse_quote! { IntoVariant }],
+                }),
             };
 
             let config = VariantConfig {
                 exclude: None,
-                include: Some(vec![parse_quote! { AsVariant }]),
+                include: Some(MacroSelectionConfig {
+                    idents: vec![parse_quote! { AsVariant }],
+                }),
                 field: None,
             };
 
@@ -482,8 +495,10 @@ mod variant_config {
             let enum_config = EnumConfig { exclude: None };
 
             let config = VariantConfig {
-                exclude: Some(vec![]),
-                include: Some(vec![parse_quote! { AsVariant }]),
+                exclude: Some(MacroSelectionConfig { idents: vec![] }),
+                include: Some(MacroSelectionConfig {
+                    idents: vec![parse_quote! { AsVariant }],
+                }),
                 field: None,
             };
 

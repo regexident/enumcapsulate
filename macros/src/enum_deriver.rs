@@ -1,41 +1,30 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{parse_quote_spanned, visit::Visit as _, DataEnum, DeriveInput, Fields, Type, Variant};
+use syn::{parse_quote_spanned, visit::Visit as _, Fields, Type, Variant};
 
-use crate::{
-    config_for_enum_with_attrs, config_for_variant, macro_name, position_of_selected_field,
-    TypeVisitor,
-};
+use crate::*;
 
 pub(crate) struct EnumDeriver {
-    input: DeriveInput,
+    item: syn::ItemEnum,
 }
 
-impl From<DeriveInput> for EnumDeriver {
-    fn from(input: DeriveInput) -> Self {
-        Self { input }
+impl From<syn::ItemEnum> for EnumDeriver {
+    fn from(item: syn::ItemEnum) -> Self {
+        Self { item }
     }
 }
 
 impl EnumDeriver {
-    fn variants(&self) -> Result<Vec<&Variant>, syn::Error> {
-        let syn::Data::Enum(DataEnum { variants, .. }) = &self.input.data else {
-            return Err(syn::Error::new(
-                self.input.ident.span(),
-                "Only enums can use this derive",
-            ));
-        };
-
-        Ok(Vec::from_iter(variants.iter()))
+    fn variants(&self) -> Vec<&Variant> {
+        self.item.variants.iter().collect()
     }
 
     pub fn derive_from(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::FROM;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         if enum_config.is_excluded(DERIVE_MACRO_NAME) {
             return Ok(TokenStream2::default());
@@ -44,11 +33,11 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
-        for variant in self.variants()? {
+        for variant in self.variants() {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
@@ -115,19 +104,18 @@ impl EnumDeriver {
     pub fn derive_try_into(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::TRY_INTO;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
-        for variant in self.variants()? {
+        for variant in self.variants() {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
@@ -188,19 +176,18 @@ impl EnumDeriver {
     pub fn derive_from_variant(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::FROM_VARIANT;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
-        for variant in self.variants()? {
+        for variant in self.variants() {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
@@ -267,19 +254,18 @@ impl EnumDeriver {
     pub fn derive_as_variant(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::AS_VARIANT;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
-        for variant in self.variants()? {
+        for variant in self.variants() {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
@@ -343,19 +329,18 @@ impl EnumDeriver {
     pub fn derive_as_variant_ref(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::AS_VARIANT_REF;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&derive_input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
-        for variant in self.variants()? {
+        for variant in self.variants() {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
@@ -414,19 +399,18 @@ impl EnumDeriver {
     pub fn derive_as_variant_mut(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::AS_VARIANT_MUT;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
-        for variant in self.variants()? {
+        for variant in self.variants() {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
@@ -485,19 +469,18 @@ impl EnumDeriver {
     pub fn derive_into_variant(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::INTO_VARIANT;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let mut impls: Vec<TokenStream2> = vec![];
 
-        for variant in self.variants()? {
+        for variant in self.variants() {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
@@ -556,10 +539,9 @@ impl EnumDeriver {
     pub fn derive_variant_downcast(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::VARIANT_DOWNCAST;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         if enum_config.is_excluded(DERIVE_MACRO_NAME) {
             return Ok(TokenStream2::default());
@@ -568,7 +550,7 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let tokens = quote! {
             impl #impl_generics ::enumcapsulate::VariantDowncast for #outer_ty #type_generics #where_clause {}
@@ -580,10 +562,9 @@ impl EnumDeriver {
     pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
         const DERIVE_MACRO_NAME: &str = macro_name::VARIANT_DISCRIMINANT;
 
-        let derive_input = &self.input;
-        let enum_ident = &derive_input.ident;
+        let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum_with_attrs(&self.input.attrs)?;
+        let enum_config = config_for_enum(&self.item)?;
 
         if enum_config.is_excluded(DERIVE_MACRO_NAME) {
             return Ok(TokenStream2::default());
@@ -592,9 +573,9 @@ impl EnumDeriver {
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
 
-        let (impl_generics, type_generics, where_clause) = self.input.generics.split_for_impl();
+        let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
-        let variants = self.variants()?;
+        let variants = self.variants();
 
         let discriminant_ident = quote::format_ident!("{outer}Discriminant");
 
@@ -655,7 +636,7 @@ impl EnumDeriver {
     }
 
     fn uses_generic_const_or_type(&self, ty: &syn::Type) -> bool {
-        let mut visitor = TypeVisitor::new(&self.input.generics);
+        let mut visitor = TypeVisitor::new(&self.item.generics);
 
         visitor.visit_type(ty);
 

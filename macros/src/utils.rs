@@ -4,12 +4,12 @@ use proc_macro2::TokenStream as TokenStream2;
 use crate::config::VariantFieldConfig;
 
 pub(crate) mod attr {
-    pub(crate) const NAMESPACE: &str = "enumcapsulate";
     pub(crate) const EXCLUDE: &str = "exclude";
-    pub(crate) const INCLUDE: &str = "include";
     pub(crate) const FIELD: &str = "field";
-    pub(crate) const NAME: &str = "name";
+    pub(crate) const INCLUDE: &str = "include";
     pub(crate) const INDEX: &str = "index";
+    pub(crate) const NAME: &str = "name";
+    pub(crate) const NAMESPACE: &str = "enumcapsulate";
 }
 
 pub(crate) mod macro_name {
