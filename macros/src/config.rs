@@ -58,12 +58,12 @@ pub(crate) type VariantExcludeConfig = MacroSelectionConfig;
 pub(crate) type VariantIncludeConfig = MacroSelectionConfig;
 
 #[derive(Clone, Default)]
-pub(crate) struct EnumConfig {
+pub(crate) struct EncapsulateEnumConfig {
     // #[enumcapsulate(exclude(…))]
     pub exclude: Option<EnumExcludeConfig>,
 }
 
-impl EnumConfig {
+impl EncapsulateEnumConfig {
     pub fn is_included(&self, name: &str) -> bool {
         !self.is_excluded(name)
     }
@@ -75,6 +75,9 @@ impl EnumConfig {
             .unwrap_or(false)
     }
 }
+
+#[derive(Clone, Default)]
+pub(crate) struct EnumConfig {}
 
 #[derive(Clone, Default)]
 pub(crate) struct VariantConfig {
@@ -89,17 +92,16 @@ pub(crate) struct VariantConfig {
 }
 
 impl VariantConfig {
-    pub fn is_excluded(&self, name: &str, config: &EnumConfig) -> bool {
-        if self.is_excluded_explicitly(name) {
-            assert!(!self.is_included_explicitly(name));
-            return true;
-        }
-
+    pub fn is_excluded(&self, name: &str) -> bool {
         if self.is_included_explicitly(name) {
             return false;
         }
 
-        config.is_excluded(name)
+        if self.is_excluded_explicitly(name) {
+            return true;
+        }
+
+        false
     }
 
     pub fn is_excluded_explicitly(&self, name: &str) -> bool {
@@ -135,17 +137,42 @@ impl VariantConfig {
     }
 }
 
-pub(crate) fn config_for_enum(enum_item: &syn::ItemEnum) -> Result<EnumConfig, syn::Error> {
-    let mut config = EnumConfig::default();
+pub(crate) fn encapsulate_config_for_enum(
+    enum_item: &syn::ItemEnum,
+) -> Result<EncapsulateEnumConfig, syn::Error> {
+    let mut config = EncapsulateEnumConfig::default();
 
     parse_enumcapsulate_attrs(&enum_item.attrs, |meta| {
         if meta.path.is_ident(attr::EXCLUDE) {
             // #[enumcapsulate(exclude(…))]
 
             let mut exclude = config.exclude.take().unwrap_or_default();
+
+            if exclude.is_empty() {
+                return Err(meta.error("expected list"));
+            }
+
             exclude.extend_idents(macro_selection_config_for_enum(&meta)?.idents);
 
             config.exclude = Some(exclude);
+        } else {
+            return Err(meta.error("unrecognized attribute"));
+        }
+
+        Ok(())
+    })?;
+
+    Ok(config)
+}
+
+pub(crate) fn config_for_enum(enum_item: &syn::ItemEnum) -> Result<EnumConfig, syn::Error> {
+    let config = EnumConfig::default();
+
+    parse_enumcapsulate_attrs(&enum_item.attrs, |meta| {
+        if meta.path.is_ident(attr::EXCLUDE) {
+            // #[enumcapsulate(exclude(…))]
+
+            // Ignored.
         } else {
             return Err(meta.error("unrecognized attribute"));
         }

@@ -98,6 +98,9 @@ Exclude this variant from trait derivation.
 
     Exclude variant from specific `enumcapsulate` derive macros.
 
+> [!IMPORTANT]
+> This attribute is only recognized by the `Encapsulate` umbrella derive macro.
+
 If you wish to opt out of a select few of `Encapsulate`'s trait derives,
 then you can do so by use of an `#[enumcapsulate(exclude(…))]` attribute:
 

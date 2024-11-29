@@ -24,11 +24,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
-
-        if enum_config.is_excluded(DERIVE_MACRO_NAME) {
-            return Ok(TokenStream2::default());
-        }
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -43,7 +39,7 @@ impl EnumDeriver {
 
             let variant_config = config_for_variant(variant)?;
 
-            if variant_config.is_excluded(DERIVE_MACRO_NAME, &enum_config) {
+            if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
@@ -106,7 +102,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -121,7 +117,7 @@ impl EnumDeriver {
 
             let variant_config = config_for_variant(variant)?;
 
-            if variant_config.is_excluded(DERIVE_MACRO_NAME, &enum_config) {
+            if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
@@ -178,7 +174,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -193,7 +189,7 @@ impl EnumDeriver {
 
             let variant_config = config_for_variant(variant)?;
 
-            if variant_config.is_excluded(DERIVE_MACRO_NAME, &enum_config) {
+            if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
@@ -256,7 +252,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -271,7 +267,7 @@ impl EnumDeriver {
 
             let variant_config = config_for_variant(variant)?;
 
-            if variant_config.is_excluded(DERIVE_MACRO_NAME, &enum_config) {
+            if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
@@ -331,7 +327,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -346,7 +342,7 @@ impl EnumDeriver {
 
             let variant_config = config_for_variant(variant)?;
 
-            if variant_config.is_excluded(DERIVE_MACRO_NAME, &enum_config) {
+            if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
@@ -401,7 +397,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -416,7 +412,7 @@ impl EnumDeriver {
 
             let variant_config = config_for_variant(variant)?;
 
-            if variant_config.is_excluded(DERIVE_MACRO_NAME, &enum_config) {
+            if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
@@ -471,7 +467,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -486,7 +482,7 @@ impl EnumDeriver {
 
             let variant_config = config_for_variant(variant)?;
 
-            if variant_config.is_excluded(DERIVE_MACRO_NAME, &enum_config) {
+            if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
@@ -537,15 +533,9 @@ impl EnumDeriver {
     }
 
     pub fn derive_variant_downcast(&self) -> Result<TokenStream2, syn::Error> {
-        const DERIVE_MACRO_NAME: &str = macro_name::VARIANT_DOWNCAST;
-
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
-
-        if enum_config.is_excluded(DERIVE_MACRO_NAME) {
-            return Ok(TokenStream2::default());
-        }
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -560,15 +550,9 @@ impl EnumDeriver {
     }
 
     pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
-        const DERIVE_MACRO_NAME: &str = macro_name::VARIANT_DISCRIMINANT;
-
         let enum_ident = &self.item.ident;
 
-        let enum_config = config_for_enum(&self.item)?;
-
-        if enum_config.is_excluded(DERIVE_MACRO_NAME) {
-            return Ok(TokenStream2::default());
-        }
+        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -636,7 +620,7 @@ impl EnumDeriver {
     }
 
     pub fn derive_encapsulate(&self) -> Result<TokenStream2, syn::Error> {
-        let enum_config = config_for_enum(&self.item)?;
+        let enum_config = encapsulate_config_for_enum(&self.item)?;
 
         let from = enum_config
             .is_included(macro_name::FROM)

@@ -366,7 +366,7 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 /// use enumcapsulate::Encapsulate;
 ///
 /// #[derive(Encapsulate)
-/// enum Outer {
+/// enum Enum {
 ///     // ...
 /// }
 /// ```
@@ -376,8 +376,30 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 /// ```ignore
 /// // ...
 ///
-/// #[derive(From, TryInto, FromVariant, AsVariant, AsVariantRef, AsVariantMut, IntoVariant, VariantDowncast, VariantDiscriminant)]
-/// enum Outer {
+/// #[derive(
+///     From,
+///     TryInto,
+///     FromVariant,
+///     IntoVariant,
+///     AsVariant,
+///     AsVariantMut,
+///     AsVariantRef,
+///     VariantDowncast,
+///     VariantDiscriminant,
+/// )]
+/// enum Enum {
+///     // ...
+/// }
+/// ```
+///
+/// If you wish to opt out of a select few of `Encapsulate`'s trait derives,
+/// then you can do so by use of an `#[enumcapsulate(exclude(…))]` attribute
+/// on the enum itself, such as if you wanted to exclude `From` and `TryInto`:
+///
+/// ```rust
+/// #[derive(Encapsulate)]
+/// #[enumcapsulate(exclude(From, TryInto))]
+/// enum Enum {
 ///     // ...
 /// }
 /// ```
