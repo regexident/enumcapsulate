@@ -635,6 +635,50 @@ impl EnumDeriver {
         })
     }
 
+    pub fn derive_encapsulate(&self) -> Result<TokenStream2, syn::Error> {
+        let enum_config = config_for_enum(&self.item)?;
+
+        let from = enum_config
+            .is_included(macro_name::FROM)
+            .then_some(self.derive_from()?);
+        let try_into = enum_config
+            .is_included(macro_name::TRY_INTO)
+            .then_some(self.derive_try_into()?);
+        let from_variant = enum_config
+            .is_included(macro_name::FROM_VARIANT)
+            .then_some(self.derive_from_variant()?);
+        let as_variant = enum_config
+            .is_included(macro_name::AS_VARIANT)
+            .then_some(self.derive_as_variant()?);
+        let as_variant_ref = enum_config
+            .is_included(macro_name::AS_VARIANT_REF)
+            .then_some(self.derive_as_variant_ref()?);
+        let as_variant_mut = enum_config
+            .is_included(macro_name::AS_VARIANT_MUT)
+            .then_some(self.derive_as_variant_mut()?);
+        let into_variant = enum_config
+            .is_included(macro_name::INTO_VARIANT)
+            .then_some(self.derive_into_variant()?);
+        let variant_downcast = enum_config
+            .is_included(macro_name::VARIANT_DOWNCAST)
+            .then_some(self.derive_variant_downcast()?);
+        let variant_discriminant = enum_config
+            .is_included(macro_name::VARIANT_DISCRIMINANT)
+            .then_some(self.derive_variant_discriminant()?);
+
+        Ok(quote::quote! {
+            #from
+            #try_into
+            #from_variant
+            #as_variant
+            #as_variant_ref
+            #as_variant_mut
+            #into_variant
+            #variant_downcast
+            #variant_discriminant
+        })
+    }
+
     fn uses_generic_const_or_type(&self, ty: &syn::Type) -> bool {
         let mut visitor = TypeVisitor::new(&self.item.generics);
 

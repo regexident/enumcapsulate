@@ -387,27 +387,6 @@ pub fn derive_encapsulate(input: TokenStream) -> TokenStream {
 
     tokenstream(|| {
         let deriver = EnumDeriver::from(item);
-
-        let from = deriver.derive_from()?;
-        let try_into = deriver.derive_try_into()?;
-        let from_variant = deriver.derive_from_variant()?;
-        let as_variant = deriver.derive_as_variant()?;
-        let as_variant_ref = deriver.derive_as_variant_ref()?;
-        let as_variant_mut = deriver.derive_as_variant_mut()?;
-        let into_variant = deriver.derive_into_variant()?;
-        let variant_downcast = deriver.derive_variant_downcast()?;
-        let variant_discriminant = deriver.derive_variant_discriminant()?;
-
-        Ok(quote::quote! {
-            #from
-            #try_into
-            #from_variant
-            #as_variant
-            #as_variant_ref
-            #as_variant_mut
-            #into_variant
-            #variant_downcast
-            #variant_discriminant
-        })
+        deriver.derive_encapsulate()
     })
 }
