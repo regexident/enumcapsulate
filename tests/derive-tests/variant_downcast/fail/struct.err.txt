@@ -3,3 +3,4 @@ error: expected `enum`
   |
 4 | pub struct Struct {
   |     ^^^^^^
+error: could not compile `<CRATE>` (bin "<BIN>") due to 1 previous error

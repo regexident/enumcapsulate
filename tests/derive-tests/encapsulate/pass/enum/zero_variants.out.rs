@@ -14,8 +14,6 @@ impl ::core::clone::Clone for EnumDiscriminant {
     }
 }
 #[automatically_derived]
-impl ::core::marker::StructuralEq for EnumDiscriminant {}
-#[automatically_derived]
 impl ::core::cmp::Eq for EnumDiscriminant {
     #[inline]
     #[doc(hidden)]
@@ -40,6 +38,7 @@ impl ::core::hash::Hash for EnumDiscriminant {
 }
 #[automatically_derived]
 impl ::core::fmt::Debug for EnumDiscriminant {
+    #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         match *self {}
     }
