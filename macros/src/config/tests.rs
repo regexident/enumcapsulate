@@ -128,43 +128,6 @@ mod enum_config {
 
         let config = config_for_enum(&item)?;
 
-        assert_eq!(config.exclude, None);
-
-        Ok(())
-    }
-
-    #[test]
-    fn accepts_empty_exclude_attrs() -> Result<(), syn::Error> {
-        let item: syn::ItemEnum = parse_quote! {
-            #[enumcapsulate(exclude)]
-            enum Dummy {}
-        };
-
-        let config = config_for_enum(&item)?;
-
-        let actual: Vec<syn::Ident> = config.exclude.unwrap().idents;
-        let expected: Vec<syn::Ident> = vec![];
-
-        assert_eq!(actual, expected);
-
-        Ok(())
-    }
-
-    #[test]
-    fn accepts_non_empty_exclude_attrs() -> Result<(), syn::Error> {
-        let item: syn::ItemEnum = parse_quote! {
-            #[enumcapsulate(exclude(AsVariant, IntoVariant))]
-            enum Dummy {}
-        };
-
-        let config = config_for_enum(&item)?;
-
-        let actual = config.exclude.unwrap().idents;
-        let expected: Vec<syn::Ident> =
-            vec![parse_quote! { AsVariant }, parse_quote! { IntoVariant }];
-
-        assert_eq!(actual, expected);
-
         Ok(())
     }
 
@@ -182,17 +145,52 @@ mod enum_config {
         Ok(())
     }
 
-    #[test]
-    fn is_excluded() {
-        let config = EnumConfig {
-            exclude: Some(MacroSelectionConfig {
-                idents: vec![parse_quote! { FromVariant }, parse_quote! { IntoVariant }],
-            }),
-        };
+    mod encapsulate {
+        use super::*;
 
-        assert_eq!(config.is_excluded("FromVariant"), true);
-        assert_eq!(config.is_excluded("IntoVariant"), true);
-        assert_eq!(config.is_excluded("AsVariant"), false);
+        #[test]
+        #[should_panic]
+        fn rejects_empty_exclude_attrs() -> Result<(), syn::Error> {
+            let item: syn::ItemEnum = parse_quote! {
+                #[enumcapsulate(exclude)]
+                enum Dummy {}
+            };
+
+            let config = encapsulate_config_for_enum(&item)?;
+
+            Ok(())
+        }
+
+        #[test]
+        fn accepts_non_empty_exclude_attrs() -> Result<(), syn::Error> {
+            let item: syn::ItemEnum = parse_quote! {
+                #[enumcapsulate(exclude(AsVariant, IntoVariant))]
+                enum Dummy {}
+            };
+
+            let config = config_for_enum(&item)?;
+
+            let actual = config.exclude.unwrap().idents;
+            let expected: Vec<syn::Ident> =
+                vec![parse_quote! { AsVariant }, parse_quote! { IntoVariant }];
+
+            assert_eq!(actual, expected);
+
+            Ok(())
+        }
+
+        #[test]
+        fn is_excluded() {
+            let config = EncapsulateEnumConfig {
+                exclude: Some(MacroSelectionConfig {
+                    idents: vec![parse_quote! { FromVariant }, parse_quote! { IntoVariant }],
+                }),
+            };
+
+            assert_eq!(config.is_excluded("FromVariant"), true);
+            assert_eq!(config.is_excluded("IntoVariant"), true);
+            assert_eq!(config.is_excluded("AsVariant"), false);
+        }
     }
 }
 
@@ -417,83 +415,7 @@ mod variant_config {
         use super::*;
 
         #[test]
-        fn no_enum_excludes() {
-            let enum_config = EnumConfig { exclude: None };
-
-            let config = VariantConfig {
-                exclude: None,
-                include: None,
-                field: None,
-            };
-
-            assert_eq!(config.is_excluded("FromVariant", &enum_config), false);
-            assert_eq!(config.is_excluded("IntoVariant", &enum_config), false);
-            assert_eq!(config.is_excluded("AsVariant", &enum_config), false);
-        }
-
-        #[test]
-        fn only_enum_excludes() {
-            let enum_config = EnumConfig {
-                exclude: Some(MacroSelectionConfig {
-                    idents: vec![parse_quote! { AsVariant }],
-                }),
-            };
-
-            let config = VariantConfig {
-                exclude: None,
-                include: None,
-                field: None,
-            };
-
-            assert_eq!(config.is_excluded("FromVariant", &enum_config), false);
-            assert_eq!(config.is_excluded("IntoVariant", &enum_config), false);
-            assert_eq!(config.is_excluded("AsVariant", &enum_config), true);
-        }
-
-        #[test]
-        fn blanket_overridden_enum_excludes() {
-            let enum_config = EnumConfig {
-                exclude: Some(MacroSelectionConfig {
-                    idents: vec![parse_quote! { AsVariant }],
-                }),
-            };
-
-            let config = VariantConfig {
-                exclude: None,
-                include: Some(MacroSelectionConfig { idents: vec![] }),
-                field: None,
-            };
-
-            assert_eq!(config.is_excluded("FromVariant", &enum_config), false);
-            assert_eq!(config.is_excluded("IntoVariant", &enum_config), false);
-            assert_eq!(config.is_excluded("AsVariant", &enum_config), false);
-        }
-
-        #[test]
-        fn selective_overridden_enum_excludes() {
-            let enum_config = EnumConfig {
-                exclude: Some(MacroSelectionConfig {
-                    idents: vec![parse_quote! { AsVariant }, parse_quote! { IntoVariant }],
-                }),
-            };
-
-            let config = VariantConfig {
-                exclude: None,
-                include: Some(MacroSelectionConfig {
-                    idents: vec![parse_quote! { AsVariant }],
-                }),
-                field: None,
-            };
-
-            assert_eq!(config.is_excluded("FromVariant", &enum_config), false);
-            assert_eq!(config.is_excluded("IntoVariant", &enum_config), true);
-            assert_eq!(config.is_excluded("AsVariant", &enum_config), false);
-        }
-
-        #[test]
         fn selective_overridden_variant_excludes() {
-            let enum_config = EnumConfig { exclude: None };
-
             let config = VariantConfig {
                 exclude: Some(MacroSelectionConfig { idents: vec![] }),
                 include: Some(MacroSelectionConfig {
@@ -502,9 +424,9 @@ mod variant_config {
                 field: None,
             };
 
-            assert_eq!(config.is_excluded("FromVariant", &enum_config), true);
-            assert_eq!(config.is_excluded("IntoVariant", &enum_config), true);
-            assert_eq!(config.is_excluded("AsVariant", &enum_config), false);
+            assert_eq!(config.is_excluded("FromVariant"), true);
+            assert_eq!(config.is_excluded("IntoVariant"), true);
+            assert_eq!(config.is_excluded("AsVariant"), false);
         }
     }
 }
