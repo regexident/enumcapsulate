@@ -646,9 +646,6 @@ impl EnumDeriver {
         let variant_downcast = enum_config
             .is_included(macro_name::VARIANT_DOWNCAST)
             .then_some(self.derive_variant_downcast()?);
-        let variant_discriminant = enum_config
-            .is_included(macro_name::VARIANT_DISCRIMINANT)
-            .then_some(self.derive_variant_discriminant()?);
 
         Ok(quote::quote! {
             #from
@@ -659,7 +656,6 @@ impl EnumDeriver {
             #as_variant_mut
             #into_variant
             #variant_downcast
-            #variant_discriminant
         })
     }
 
