@@ -82,9 +82,6 @@ mod macro_idents {
         let recognized: Vec<&str> = vec!["Foo", "Bar"];
         ensure_only_recognized_ident_names(&idents, &recognized)?;
 
-        let conflicting: Vec<syn::Ident> = vec![parse_quote! { Baz }, parse_quote! { Blee }];
-        ensure_no_conflicting_idents(&idents, &conflicting)?;
-
         Ok(())
     }
 
@@ -101,20 +98,6 @@ mod macro_idents {
 
         Ok(())
     }
-
-    #[test]
-    fn detects_conflicting_idents() -> Result<(), syn::Error> {
-        let idents: Vec<syn::Ident> = vec![parse_quote! { Foo }, parse_quote! { Bar }];
-
-        let conflicting: Vec<syn::Ident> = vec![parse_quote! { Bar }];
-        let error = ensure_no_conflicting_idents(&idents, &conflicting)
-            .err()
-            .unwrap();
-
-        assert_eq!(error.to_string(), "conflicting macro derive");
-
-        Ok(())
-    }
 }
 
 mod enum_config {
@@ -126,7 +109,9 @@ mod enum_config {
             enum Dummy {}
         };
 
-        let config = config_for_enum(&item)?;
+        let result = config_for_enum(&item);
+
+        assert!(result.is_ok());
 
         Ok(())
     }
@@ -149,32 +134,47 @@ mod enum_config {
         use super::*;
 
         #[test]
-        #[should_panic]
-        fn rejects_empty_exclude_attrs() -> Result<(), syn::Error> {
+        fn rejects_empty_encapsulate_enum_exclude_attrs() -> Result<(), syn::Error> {
             let item: syn::ItemEnum = parse_quote! {
                 #[enumcapsulate(exclude)]
                 enum Dummy {}
             };
 
-            let config = encapsulate_config_for_enum(&item)?;
+            let result = encapsulate_config_for_enum(&item);
+
+            assert!(result.is_err());
 
             Ok(())
         }
 
         #[test]
-        fn accepts_non_empty_exclude_attrs() -> Result<(), syn::Error> {
+        fn accepts_non_empty_encapsulate_enum_exclude_attrs() -> Result<(), syn::Error> {
             let item: syn::ItemEnum = parse_quote! {
                 #[enumcapsulate(exclude(AsVariant, IntoVariant))]
                 enum Dummy {}
             };
 
-            let config = config_for_enum(&item)?;
+            let config = encapsulate_config_for_enum(&item)?;
 
             let actual = config.exclude.unwrap().idents;
             let expected: Vec<syn::Ident> =
                 vec![parse_quote! { AsVariant }, parse_quote! { IntoVariant }];
 
             assert_eq!(actual, expected);
+
+            Ok(())
+        }
+
+        #[test]
+        fn accepts_empty_enum_exclude_attrs() -> Result<(), syn::Error> {
+            let item: syn::ItemEnum = parse_quote! {
+                #[enumcapsulate(exclude(AsVariant, IntoVariant))]
+                enum Dummy {}
+            };
+
+            let result = config_for_enum(&item);
+
+            assert!(result.is_ok());
 
             Ok(())
         }
@@ -206,7 +206,6 @@ mod variant_config {
         let config = config_for_variant(&variant)?;
 
         assert_eq!(config.exclude, None);
-        assert_eq!(config.include, None);
         assert_eq!(config.field, None);
 
         Ok(())
@@ -222,7 +221,6 @@ mod variant_config {
         let config = config_for_variant(&variant)?;
 
         assert_eq!(config.exclude, None);
-        assert_eq!(config.include, None);
         assert_eq!(config.field, Some(VariantFieldConfig::Index(2)));
 
         Ok(())
@@ -238,7 +236,6 @@ mod variant_config {
         let config = config_for_variant(&variant)?;
 
         assert_eq!(config.exclude, None);
-        assert_eq!(config.include, None);
         assert_eq!(config.field, Some(VariantFieldConfig::Index(2)));
 
         Ok(())
@@ -296,7 +293,6 @@ mod variant_config {
         let config = config_for_variant(&variant)?;
 
         assert_eq!(config.exclude, None);
-        assert_eq!(config.include, None);
         assert_eq!(
             config.field,
             Some(VariantFieldConfig::Name("bar".to_owned()))
@@ -320,10 +316,9 @@ mod variant_config {
     }
 
     #[test]
-    fn accepts_empty_exclude_include_attrs() -> Result<(), syn::Error> {
+    fn accepts_empty_exclude_attrs() -> Result<(), syn::Error> {
         let variant: syn::Variant = parse_quote! {
             #[enumcapsulate(exclude)]
-            #[enumcapsulate(include)]
             Dummy(bool)
         };
 
@@ -333,20 +328,15 @@ mod variant_config {
             config.exclude.unwrap(),
             MacroSelectionConfig { idents: vec![] }
         );
-        assert_eq!(
-            config.include.unwrap(),
-            MacroSelectionConfig { idents: vec![] }
-        );
         assert_eq!(config.field, None);
 
         Ok(())
     }
 
     #[test]
-    fn accepts_non_empty_exclude_include_attrs() -> Result<(), syn::Error> {
+    fn accepts_non_empty_exclude_attrs() -> Result<(), syn::Error> {
         let variant: syn::Variant = parse_quote! {
             #[enumcapsulate(exclude(From, TryInto))]
-            #[enumcapsulate(include(FromVariant, IntoVariant))]
             Dummy(bool)
         };
 
@@ -356,12 +346,6 @@ mod variant_config {
             config.exclude.unwrap(),
             MacroSelectionConfig {
                 idents: vec![parse_quote! { From }, parse_quote! { TryInto }]
-            }
-        );
-        assert_eq!(
-            config.include.unwrap(),
-            MacroSelectionConfig {
-                idents: vec![parse_quote! { FromVariant }, parse_quote! { IntoVariant }]
             }
         );
 
@@ -382,43 +366,25 @@ mod variant_config {
         Ok(())
     }
 
-    #[test]
-    fn rejects_unrecognized_include_attrs() -> Result<(), syn::Error> {
-        let variant: syn::Variant = parse_quote! {
-            #[enumcapsulate(include(IntoVariant, Unrecognized))]
-            Dummy(bool)
-        };
-
-        let error = config_for_variant(&variant).err().unwrap();
-
-        assert_eq!(error.to_string(), "unrecognized macro derive");
-
-        Ok(())
-    }
-
-    #[test]
-    fn rejects_conflicting_exclude_include_attrs() -> Result<(), syn::Error> {
-        let variant: syn::Variant = parse_quote! {
-            #[enumcapsulate(exclude(From, TryInto))]
-            #[enumcapsulate(include(TryInto, IntoVariant))]
-            Dummy(bool)
-        };
-
-        let error = config_for_variant(&variant).err().unwrap();
-
-        assert_eq!(error.to_string(), "conflicting macro derive");
-
-        Ok(())
-    }
-
     mod is_excluded {
         use super::*;
 
         #[test]
-        fn selective_overridden_variant_excludes() {
+        fn wildcard_variant_excludes() {
             let config = VariantConfig {
                 exclude: Some(MacroSelectionConfig { idents: vec![] }),
-                include: Some(MacroSelectionConfig {
+                field: None,
+            };
+
+            assert_eq!(config.is_excluded("FromVariant"), true);
+            assert_eq!(config.is_excluded("IntoVariant"), true);
+            assert_eq!(config.is_excluded("AsVariant"), false);
+        }
+
+        #[test]
+        fn selective_variant_excludes() {
+            let config = VariantConfig {
+                exclude: Some(MacroSelectionConfig {
                     idents: vec![parse_quote! { AsVariant }],
                 }),
                 field: None,

@@ -6,7 +6,6 @@ use crate::config::VariantFieldConfig;
 pub(crate) mod attr {
     pub(crate) const EXCLUDE: &str = "exclude";
     pub(crate) const FIELD: &str = "field";
-    pub(crate) const INCLUDE: &str = "include";
     pub(crate) const INDEX: &str = "index";
     pub(crate) const NAME: &str = "name";
     pub(crate) const NAMESPACE: &str = "enumcapsulate";

@@ -59,9 +59,6 @@ enum Enum { /* ... */ }
 > your your particular use case then your can selectively opt them out by use of an
 > `#[enumcapsulate(exclude(…))]` attribute on the enum itself.
 >
-> You can even opt trait derives back in at the variant-level, by use of `#[enumcapsulate(include)]`
-> for previously opted-out derives, or individually by use of `#[enumcapsulate(include(…))]`:
->
 > ```rust
 > #[derive(Encapsulate)]
 > #[enumcapsulate(exclude(From, TryInto))]
@@ -70,12 +67,14 @@ enum Enum { /* ... */ }
 >     // due to existing enum-level attribute:
 >     VariantA(VariantA),
 >
->     // Selectively re-included for all derives:
->     #[enumcapsulate(include)]
+>     // Exclude derivation of any traits
+>     // for this specific variant's type:
+>     #[enumcapsulate(exclude)]
 >     VariantB(VariantB),
 >
->     // Selectively re-included for `From` derive:
->     #[enumcapsulate(include(From))]
+>     // Selectively exclude derivation of `From` trait
+>     // for this specific variant's type:
+>     #[enumcapsulate(exclude(From))]
 >     VariantC(VariantC),
 > }
 > ```
@@ -110,32 +109,6 @@ then you can do so by use of an `#[enumcapsulate(exclude(…))]` attribute:
 enum Enum { /* ... */ }
 ```
 
-> [!TIP]
-> If you wish to opt all but a select few variants out of a trait's derive, then
-> you can do so by use of an `#[enumcapsulate(exclude(…))]` attribute on the enum,
-> together with a `#[enumcapsulate(include(…))]` attribute on the variant:
->
-> ```rust
-> #[derive(Encapsulate)]
-> #[enumcapsulate(exclude(From, TryInto))]
-> enum Enum {
->     // Excluded from `From` and `TryInto` derives
->     // due to existing enum-level attribute:
->     VariantA(VariantA),
->
->     // Selectively re-included for all derives:
->     #[enumcapsulate(include)]
->     VariantB(VariantB),
->
->     // Selectively re-included for
->     // just the `From` derive:
->     #[enumcapsulate(include(From))]
->     VariantC(VariantC),
->
->     // ...
-> }
-> ```
-
 ### Variant attributes
 
 > [!NOTE]
@@ -169,71 +142,6 @@ enum Enum {
     VariantC(VariantC),
 }
 ```
-
-> [!TIP]
-> Combine the use of `#[enumcapsulate(exclude)]` with `#[enumcapsulate(include(…)]`
-> in order to exclude a variant from all but a select few derive macros.
->
-> ```rust
-> // Exclude variant from all derives,
-> // then selectively re-include it for
-> // just the `From` and `TryInto` derives:
-> #[enumcapsulate(exclude)]
-> #[enumcapsulate(include(From, TryInto))]
-> ```
-
-This attribute is recognized by the following variant-based derive macros:
-
-- `AsVariant`
-- `AsVariantMut`
-- `AsVariantRef`
-- `FromVariant`
-- `IntoVariant`
-- `From`
-- `TryInto`
-
-… as well as the umbrella derive macro:
-
-- `Encapsulate`
-
-#### `#[enumcapsulate(include(…)]`
-
-Include this variant for specific trait derivation (overriding existing uses of `#[enumcapsulate(exclude)]`).
-
-- `#[enumcapsulate(include)]`
-
-    Include variant from *all* `enumcapsulate` derive macros.
-
-- `#[enumcapsulate(include(…))]`
-
-    Include variant from specific `enumcapsulate` derive macros.
-
-```rust
-#[derive(Encapsulate)]
-#[enumcapsulate(exclude(From, TryInto))]
-enum Enum {
-    // Included by default.
-    VariantA(VariantA),
-    
-    // Selectively included for just
-    // the `From` and `TryInto` derives:
-    #[enumcapsulate(exclude)]
-    #[enumcapsulate(include(From, TryInto))]
-    VariantB(VariantB),
-}
-```
-
-> [!NOTE]
-> The `#[enumcapsulate(include(…)]` variant has a higher precedence than `#[enumcapsulate(exclude)]`,
-> and thus acts as a selective override if both are present on a variant:
->
-> ```rust
-> // Exclude variant from all derives,
-> // then selectively re-include it for
-> // just the `From` and `TryInto` derives:
-> #[enumcapsulate(exclude)]
-> #[enumcapsulate(include(From, TryInto))]
-> ```
 
 This attribute is recognized by the following variant-based derive macros:
 
