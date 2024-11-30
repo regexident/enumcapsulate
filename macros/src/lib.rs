@@ -348,7 +348,7 @@ pub fn derive_variant_downcast(input: TokenStream) -> TokenStream {
 /// }
 /// ```
 ///
-#[proc_macro_derive(VariantDiscriminant)]
+#[proc_macro_derive(VariantDiscriminant, attributes(enumcapsulate))]
 pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
     let item = parse_macro_input!(input as syn::ItemEnum);
 

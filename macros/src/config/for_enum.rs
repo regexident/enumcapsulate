@@ -1,9 +1,12 @@
+mod discriminant;
 mod encapsulate;
 mod standard;
+mod variant_discriminant;
 
 pub(crate) use self::encapsulate::EncapsulateDeriveEnumConfig;
+pub(crate) use self::variant_discriminant::VariantDiscriminantDeriveEnumConfig;
 
-use self::standard::EnumConfig;
+use self::{discriminant::DiscriminantConfig, standard::EnumConfig};
 
 pub(crate) type FromDeriveEnumConfig = EnumConfig;
 pub(crate) type TryIntoDeriveEnumConfig = EnumConfig;

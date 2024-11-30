@@ -552,60 +552,83 @@ impl EnumDeriver {
     pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
         let enum_ident = &self.item.ident;
 
-        let outer = enum_ident;
-        let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
+        let enum_config = VariantDiscriminantDeriveEnumConfig::from_enum(&self.item)?;
+
+        let mut discriminant_enum_ident = quote::format_ident!("{enum_ident}Discriminant");
+        let mut repr_attr: Option<TokenStream2> = None;
+
+        if let Some(ident) = enum_config.ident() {
+            discriminant_enum_ident = ident.clone();
+        }
+
+        if let Some(ty) = enum_config.repr() {
+            repr_attr = Some(quote! {
+                #[repr(#ty)]
+            });
+        }
 
         let (impl_generics, type_generics, where_clause) = self.item.generics.split_for_impl();
 
         let variants = self.variants();
 
-        let discriminant_ident = quote::format_ident!("{outer}Discriminant");
-
         let mut discriminant_variants: Vec<TokenStream2> = vec![];
-
-        for variant in &variants {
-            let variant_ident = &variant.ident;
-
-            discriminant_variants.push(quote! {
-                #variant_ident,
-            });
-        }
-
-        let discriminant_enum = quote! {
-            #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
-            pub enum #discriminant_ident {
-                #(#discriminant_variants)*
-            }
-        };
-
         let mut match_arms: Vec<TokenStream2> = vec![];
 
-        for variant in variants {
-            let variant_ident = &variant.ident;
-            let inner = variant_ident;
+        for variant in &variants {
+            let variant_config = VariantDiscriminantDeriveVariantConfig::from_variant(variant)?;
+
+            let variant_ident: &syn::Ident = &variant.ident;
+
+            let mut discriminant_variant_ident: syn::Ident = variant_ident.clone();
+            let mut discriminant_variant_expr: Option<&syn::Expr> =
+                variant.discriminant.as_ref().map(|(_, expr)| expr);
+
+            if let Some(ident) = variant_config.ident() {
+                discriminant_variant_ident = ident.clone();
+            }
+
+            if let Some(expr) = variant_config.expr() {
+                discriminant_variant_expr = Some(expr);
+            }
+
+            let variant_discriminant = discriminant_variant_expr.map(|expr| {
+                quote! { = #expr }
+            });
+
+            discriminant_variants.push(quote! {
+                #discriminant_variant_ident #variant_discriminant,
+            });
 
             let pattern = match &variant.fields {
                 Fields::Named(_) => quote! {
-                    #outer_ty::#inner { .. }
+                    #enum_ident::#variant_ident { .. }
                 },
                 Fields::Unnamed(_) => quote! {
-                    #outer_ty::#inner(..)
+                    #enum_ident::#variant_ident(..)
                 },
                 Fields::Unit => quote! {
-                    #outer_ty::#inner
+                    #enum_ident::#variant_ident
                 },
             };
 
             match_arms.push(quote! {
-                #pattern => #discriminant_ident::#inner,
+                #pattern => #discriminant_enum_ident::#discriminant_variant_ident,
             });
         }
+
+        let discriminant_enum = quote! {
+            #repr_attr
+            #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+            pub enum #discriminant_enum_ident {
+                #(#discriminant_variants)*
+            }
+        };
 
         Ok(quote! {
             #discriminant_enum
 
-            impl #impl_generics ::enumcapsulate::VariantDiscriminant for #outer_ty #type_generics #where_clause {
-                type Discriminant = #discriminant_ident;
+            impl #impl_generics ::enumcapsulate::VariantDiscriminant for #enum_ident #type_generics #where_clause {
+                type Discriminant = #discriminant_enum_ident;
 
                 fn variant_discriminant(&self) -> Self::Discriminant {
                     match self {
