@@ -554,6 +554,8 @@ impl EnumDeriver {
 
         let enum_config = VariantDiscriminantDeriveEnumConfig::from_enum(&self.item)?;
 
+        let visibility = &self.item.vis;
+
         let mut discriminant_enum_ident = quote::format_ident!("{enum_ident}Discriminant");
         let mut repr_attr: Option<TokenStream2> = None;
 
@@ -619,7 +621,7 @@ impl EnumDeriver {
         let discriminant_enum = quote! {
             #repr_attr
             #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
-            pub enum #discriminant_enum_ident {
+            #visibility enum #discriminant_enum_ident {
                 #(#discriminant_variants)*
             }
         };
