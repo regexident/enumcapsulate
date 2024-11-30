@@ -13,28 +13,30 @@ Safe casting for newtype enums and their variants.
 
 The `enumcapsulate` crate exports the following traits:
 
-| Traits                | Functionality                                                                                                                                                        |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AsVariant`           | Provides owned access to the current variant's field.                                                                                                                |
-| `AsVariantMut`        | Provides mutable borrowed access to the current variant's field.                                                                                                     |
-| `AsVariantRef`        | Provides borrowed access to the current variant's field.                                                                                                             |
-| `Encapsulate`         | Umbrella derive macro for `AsVariant`, `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `TryInto`, `VariantDiscriminant`, and `VariantDowncast` |
-| `FromVariant`         | Creates an instance of `Self` from the unambiguous field type of one of its variants.                                                                                |
-| `IntoVariant`         | Returns the current variant's field, consuming `self`.                                                                                                               |
-| `VariantDiscriminant` | Used to obtain an enum variant's discriminant                                                                                                                        |
-| `VariantDowncast`     | Convenience umbrella trait utilizing `AsVariant`, `AsVariantRef`, `AsVariantMut`, and `IntoVariant`                                                                  |
+| Traits                | Functionality                                                                                                                                  |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Encapsulate`         | Umbrella derive macro for `AsVariant`, `AsVariantMut`, `AsVariantRef`, `From`, `FromVariant`, `IntoVariant`, `TryInto`, and `VariantDowncast`. |
+| `FromVariant`         | Creates an instance of `Self` from the unambiguous field type of one of its variants.                                                          |
+| `IntoVariant`         | Returns the current variant's field, consuming `self`.                                                                                         |
+| `AsVariant`           | Provides owned access to the current variant's field.                                                                                          |
+| `AsVariantMut`        | Provides mutable borrowed access to the current variant's field.                                                                               |
+| `AsVariantRef`        | Provides borrowed access to the current variant's field.                                                                                       |
+| `VariantDowncast`     | Convenience umbrella trait utilizing `AsVariant`, `AsVariantRef`, `AsVariantMut`, and `IntoVariant`.                                           |
+| `VariantDiscriminant` | Used to obtain an enum variant's discriminant.                                                                                                 |
 
 ## Derive macros
 
 The `enumcapsulate` crate exports the following corresponding derive macros, if the `"derive"` feature is enabled (which is the default):
 
+- `Encapsulate`
+- `From`
+- `TryInto`
+- `FromVariant`
+- `IntoVariant`
 - `AsVariant`
 - `AsVariantMut`
 - `AsVariantRef`
-- `Encapsulate`
-- `From`
-- `FromVariant`
-- `IntoVariant`- `TryInto`
+- `VariantDowncast`
 - `VariantDiscriminant`
 
 ## Documentation
