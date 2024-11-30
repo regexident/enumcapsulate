@@ -47,15 +47,10 @@ impl MacroSelectionConfig {
     pub fn extend_idents(&mut self, iter: impl IntoIterator<Item = syn::Ident>) {
         self.idents.extend(iter);
     }
-
-    pub(crate) fn idents(&self) -> &[syn::Ident] {
-        &self.idents
-    }
 }
 
 pub(crate) type EnumExcludeConfig = MacroSelectionConfig;
 pub(crate) type VariantExcludeConfig = MacroSelectionConfig;
-pub(crate) type VariantIncludeConfig = MacroSelectionConfig;
 
 #[derive(Clone, Default)]
 pub(crate) struct EncapsulateEnumConfig {
@@ -84,56 +79,26 @@ pub(crate) struct VariantConfig {
     // #[enumcapsulate(exclude(…))]
     pub exclude: Option<VariantExcludeConfig>,
 
-    // #[enumcapsulate(include(…))]
-    pub include: Option<VariantIncludeConfig>,
-
     // #[enumcapsulate(field(…))]
     pub field: Option<VariantFieldConfig>,
 }
 
 impl VariantConfig {
-    pub fn is_excluded(&self, name: &str) -> bool {
-        if self.is_included_explicitly(name) {
-            return false;
-        }
-
-        if self.is_excluded_explicitly(name) {
-            return true;
-        }
-
-        false
+    #[allow(dead_code)]
+    pub fn is_included(&self, name: &str) -> bool {
+        !self.is_excluded(name)
     }
 
-    pub fn is_excluded_explicitly(&self, name: &str) -> bool {
+    pub fn is_excluded(&self, name: &str) -> bool {
         let Some(excluded) = &self.exclude else {
             return false;
         };
 
         if excluded.is_empty() {
-            if let Some(included) = &self.include {
-                return !included.contains(name);
-            } else {
-                return true;
-            }
+            true
+        } else {
+            excluded.contains(name)
         }
-
-        excluded.contains(name)
-    }
-
-    pub fn is_included_explicitly(&self, name: &str) -> bool {
-        let Some(included) = &self.include else {
-            return false;
-        };
-
-        if included.is_empty() {
-            if let Some(excluded) = &self.exclude {
-                return !excluded.contains(name);
-            } else {
-                return true;
-            }
-        }
-
-        included.contains(name)
     }
 }
 
@@ -205,19 +170,9 @@ pub(crate) fn config_for_variant(variant: &syn::Variant) -> Result<VariantConfig
 
             let mut exclude = config.exclude.take().unwrap_or_default();
 
-            let opposite = config.include.as_ref();
-            exclude.extend_idents(macro_selection_config_for_variant(&meta, opposite)?.idents);
+            exclude.extend_idents(macro_selection_config_for_variant(&meta)?.idents);
 
             config.exclude = Some(exclude);
-        } else if meta.path.is_ident(attr::INCLUDE) {
-            // #[enumcapsulate(include(…))]
-
-            let mut include = config.include.take().unwrap_or_default();
-
-            let opposite: Option<&MacroSelectionConfig> = config.exclude.as_ref();
-            include.extend_idents(macro_selection_config_for_variant(&meta, opposite)?.idents);
-
-            config.include = Some(include);
         } else if meta.path.is_ident(attr::FIELD) {
             // #[enumcapsulate(field(…))]
             meta.parse_nested_meta(|meta| {
@@ -311,15 +266,11 @@ pub(crate) fn macro_selection_config_for_enum(
 
 pub(crate) fn macro_selection_config_for_variant(
     meta: &syn::meta::ParseNestedMeta<'_>,
-    opposite: Option<&MacroSelectionConfig>,
 ) -> Result<MacroSelectionConfig, syn::Error> {
     let idents = parse_idents_from_meta_list(meta)?;
 
     let recognized = RECOGNIZED_VARIANT_LEVEL_MACROS;
     ensure_only_recognized_ident_names(&idents, recognized)?;
-
-    let conflict_list = opposite.map(|config| config.idents()).unwrap_or(&[]);
-    ensure_no_conflicting_idents(&idents, conflict_list)?;
 
     Ok(MacroSelectionConfig { idents })
 }
@@ -336,32 +287,6 @@ pub(crate) fn ensure_only_recognized_ident_names(
 
     for ident in unrecognized {
         let ident_err = syn::Error::new_spanned(ident, "unrecognized macro derive");
-        if let Some(error) = error.as_mut() {
-            error.combine(ident_err);
-        } else {
-            error = Some(ident_err)
-        }
-    }
-
-    if let Some(err) = error {
-        return Err(err);
-    }
-
-    Ok(())
-}
-
-pub(crate) fn ensure_no_conflicting_idents(
-    idents: &[syn::Ident],
-    conflicting: &[syn::Ident],
-) -> Result<(), syn::Error> {
-    let mut error: Option<syn::Error> = None;
-
-    let conflicting = idents
-        .iter()
-        .filter(|&ident| conflicting.iter().any(|conflicting| ident == conflicting));
-
-    for ident in conflicting {
-        let ident_err = syn::Error::new_spanned(ident, "conflicting macro derive");
         if let Some(error) = error.as_mut() {
             error.combine(ident_err);
         } else {

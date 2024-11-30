@@ -27,6 +27,7 @@ Please make sure to add your changes to the appropriate categories:
 - Bumped MSRV from "1.74.0" to "1.78.0".
 - Made the enum-level `#[enumcapsulate(exclude(…))]` helper macros only have an effect on derives, when orchestrated through the `Encapsulate` derive macro.
 - Made `Encapsulate` derive macro no longer derive `VariantDiscriminant`.
+- Removed potentially confusing `#[enumcapsulate(include(…))]` helper attributes.
 
 ### Deprecated
 
