@@ -148,11 +148,13 @@ pub(crate) fn encapsulate_config_for_enum(
 
             let mut exclude = config.exclude.take().unwrap_or_default();
 
-            if exclude.is_empty() {
+            let idents = macro_selection_config_for_enum(&meta)?.idents;
+
+            if idents.is_empty() {
                 return Err(meta.error("expected list"));
             }
 
-            exclude.extend_idents(macro_selection_config_for_enum(&meta)?.idents);
+            exclude.extend_idents(idents);
 
             config.exclude = Some(exclude);
         } else {
@@ -172,7 +174,12 @@ pub(crate) fn config_for_enum(enum_item: &syn::ItemEnum) -> Result<EnumConfig, s
         if meta.path.is_ident(attr::EXCLUDE) {
             // #[enumcapsulate(exclude(…))]
 
-            // Ignored.
+            meta.parse_nested_meta(|_meta| {
+                // Here we're not interested in any of the existing
+                // sub-attributes, but we need to parse the list anyway.
+
+                Ok(())
+            })?;
         } else {
             return Err(meta.error("unrecognized attribute"));
         }
@@ -378,6 +385,7 @@ pub(crate) fn parse_idents_from_meta_list(
     if lookahead.peek(syn::token::Paren) {
         let content;
         syn::parenthesized!(content in meta.input);
+
         let punctuated: Punctuated<syn::Ident, syn::Token![,]> =
             content.parse_terminated(syn::Ident::parse, syn::Token![,])?;
 
