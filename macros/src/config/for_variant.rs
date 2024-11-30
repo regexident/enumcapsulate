@@ -1,6 +1,10 @@
+mod discriminant;
 mod standard;
+mod variant_discriminant;
 
-use self::standard::VariantConfig;
+pub(crate) use self::variant_discriminant::VariantDiscriminantDeriveVariantConfig;
+
+use self::{discriminant::DiscriminantConfig, standard::VariantConfig};
 
 pub(crate) type FromDeriveVariantConfig = VariantConfig;
 pub(crate) type TryIntoDeriveVariantConfig = VariantConfig;

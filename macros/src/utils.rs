@@ -2,9 +2,15 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 
 pub(crate) mod attr {
+    #![allow(dead_code)]
+
+    pub(crate) const DISCRIMINANT: &str = "discriminant";
     pub(crate) const EXCLUDE: &str = "exclude";
     pub(crate) const FIELD: &str = "field";
+    pub(crate) const NAME: &str = "name";
     pub(crate) const NAMESPACE: &str = "enumcapsulate";
+    pub(crate) const REPR: &str = "repr";
+    pub(crate) const VALUE: &str = "value";
 }
 
 pub(crate) mod macro_name {
