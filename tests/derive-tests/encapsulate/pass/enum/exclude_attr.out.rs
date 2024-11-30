@@ -1,6 +1,4 @@
-use enumcapsulate::{
-    AsVariant, AsVariantMut, AsVariantRef, Encapsulate, FromVariant, IntoVariant,
-};
+use enumcapsulate::Encapsulate;
 pub struct VariantA;
 #[automatically_derived]
 impl ::core::clone::Clone for VariantA {
@@ -17,46 +15,41 @@ impl ::core::clone::Clone for VariantB {
         VariantB
     }
 }
+pub struct VariantC;
+#[automatically_derived]
+impl ::core::clone::Clone for VariantC {
+    #[inline]
+    fn clone(&self) -> VariantC {
+        VariantC
+    }
+}
+pub struct VariantD;
+#[automatically_derived]
+impl ::core::clone::Clone for VariantD {
+    #[inline]
+    fn clone(&self) -> VariantD {
+        VariantD
+    }
+}
+#[enumcapsulate(exclude(From, TryInto))]
 pub enum Enum {
-    VariantA(VariantA),
-    VariantB { b: VariantB },
-}
-impl ::core::convert::From<VariantA> for Enum {
-    fn from(inner: VariantA) -> Self {
-        Self::VariantA(inner)
-    }
-}
-impl ::core::convert::From<VariantB> for Enum {
-    fn from(inner: VariantB) -> Self {
-        Self::VariantB { b: inner }
-    }
-}
-impl ::core::convert::TryFrom<Enum> for VariantA {
-    type Error = Enum;
-    fn try_from(outer: Enum) -> Result<Self, Self::Error> {
-        match outer {
-            Enum::VariantA(inner, ..) => Ok(inner),
-            err => Err(err),
-        }
-    }
-}
-impl ::core::convert::TryFrom<Enum> for VariantB {
-    type Error = Enum;
-    fn try_from(outer: Enum) -> Result<Self, Self::Error> {
-        match outer {
-            Enum::VariantB { b: inner, .. } => Ok(inner),
-            err => Err(err),
-        }
-    }
+    OneTupleField(VariantA),
+    OneStructField { variant: VariantB },
+    #[enumcapsulate(exclude)]
+    ExcludedWildcard(VariantC),
+    #[enumcapsulate(exclude(FromVariant, AsVariant))]
+    ExcludedSelective(VariantD),
 }
 impl ::enumcapsulate::FromVariant<VariantA> for Enum {
     fn from_variant(inner: VariantA) -> Self {
-        Self::VariantA(inner)
+        Self::OneTupleField(inner)
     }
 }
 impl ::enumcapsulate::FromVariant<VariantB> for Enum {
     fn from_variant(inner: VariantB) -> Self {
-        Self::VariantB { b: inner }
+        Self::OneStructField {
+            variant: inner,
+        }
     }
 }
 impl ::enumcapsulate::AsVariant<VariantA> for Enum
@@ -65,7 +58,7 @@ where
 {
     fn as_variant(&self) -> Option<VariantA> {
         match self {
-            Enum::VariantA(inner, ..) => Some(inner.clone()),
+            Enum::OneTupleField(inner, ..) => Some(inner.clone()),
             _ => None,
         }
     }
@@ -76,7 +69,7 @@ where
 {
     fn as_variant(&self) -> Option<VariantB> {
         match self {
-            Enum::VariantB { b: inner, .. } => Some(inner.clone()),
+            Enum::OneStructField { variant: inner, .. } => Some(inner.clone()),
             _ => None,
         }
     }
@@ -84,7 +77,7 @@ where
 impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantA> {
         match self {
-            Enum::VariantA(inner, ..) => Some(inner),
+            Enum::OneTupleField(inner, ..) => Some(inner),
             _ => None,
         }
     }
@@ -92,7 +85,15 @@ impl ::enumcapsulate::AsVariantRef<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantRef<VariantB> for Enum {
     fn as_variant_ref(&self) -> Option<&VariantB> {
         match self {
-            Enum::VariantB { b: inner, .. } => Some(inner),
+            Enum::OneStructField { variant: inner, .. } => Some(inner),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariantRef<VariantD> for Enum {
+    fn as_variant_ref(&self) -> Option<&VariantD> {
+        match self {
+            Enum::ExcludedSelective(inner, ..) => Some(inner),
             _ => None,
         }
     }
@@ -100,7 +101,7 @@ impl ::enumcapsulate::AsVariantRef<VariantB> for Enum {
 impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantA> {
         match self {
-            Enum::VariantA(inner, ..) => Some(inner),
+            Enum::OneTupleField(inner, ..) => Some(inner),
             _ => None,
         }
     }
@@ -108,7 +109,15 @@ impl ::enumcapsulate::AsVariantMut<VariantA> for Enum {
 impl ::enumcapsulate::AsVariantMut<VariantB> for Enum {
     fn as_variant_mut(&mut self) -> Option<&mut VariantB> {
         match self {
-            Enum::VariantB { b: inner, .. } => Some(inner),
+            Enum::OneStructField { variant: inner, .. } => Some(inner),
+            _ => None,
+        }
+    }
+}
+impl ::enumcapsulate::AsVariantMut<VariantD> for Enum {
+    fn as_variant_mut(&mut self) -> Option<&mut VariantD> {
+        match self {
+            Enum::ExcludedSelective(inner, ..) => Some(inner),
             _ => None,
         }
     }
@@ -116,7 +125,7 @@ impl ::enumcapsulate::AsVariantMut<VariantB> for Enum {
 impl ::enumcapsulate::IntoVariant<VariantA> for Enum {
     fn into_variant(self) -> Result<VariantA, Self> {
         match self {
-            Enum::VariantA(inner, ..) => Ok(inner),
+            Enum::OneTupleField(inner, ..) => Ok(inner),
             err => Err(err),
         }
     }
@@ -124,15 +133,25 @@ impl ::enumcapsulate::IntoVariant<VariantA> for Enum {
 impl ::enumcapsulate::IntoVariant<VariantB> for Enum {
     fn into_variant(self) -> Result<VariantB, Self> {
         match self {
-            Enum::VariantB { b: inner, .. } => Ok(inner),
+            Enum::OneStructField { variant: inner, .. } => Ok(inner),
+            err => Err(err),
+        }
+    }
+}
+impl ::enumcapsulate::IntoVariant<VariantD> for Enum {
+    fn into_variant(self) -> Result<VariantD, Self> {
+        match self {
+            Enum::ExcludedSelective(inner, ..) => Ok(inner),
             err => Err(err),
         }
     }
 }
 impl ::enumcapsulate::VariantDowncast for Enum {}
 pub enum EnumDiscriminant {
-    VariantA,
-    VariantB,
+    OneTupleField,
+    OneStructField,
+    ExcludedWildcard,
+    ExcludedSelective,
 }
 #[automatically_derived]
 impl ::core::marker::Copy for EnumDiscriminant {}
@@ -176,8 +195,10 @@ impl ::core::fmt::Debug for EnumDiscriminant {
         ::core::fmt::Formatter::write_str(
             f,
             match self {
-                EnumDiscriminant::VariantA => "VariantA",
-                EnumDiscriminant::VariantB => "VariantB",
+                EnumDiscriminant::OneTupleField => "OneTupleField",
+                EnumDiscriminant::OneStructField => "OneStructField",
+                EnumDiscriminant::ExcludedWildcard => "ExcludedWildcard",
+                EnumDiscriminant::ExcludedSelective => "ExcludedSelective",
             },
         )
     }
@@ -186,18 +207,12 @@ impl ::enumcapsulate::VariantDiscriminant for Enum {
     type Discriminant = EnumDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {
-            Enum::VariantA(..) => EnumDiscriminant::VariantA,
-            Enum::VariantB { .. } => EnumDiscriminant::VariantB,
+            Enum::OneTupleField(..) => EnumDiscriminant::OneTupleField,
+            Enum::OneStructField { .. } => EnumDiscriminant::OneStructField,
+            Enum::ExcludedWildcard(..) => EnumDiscriminant::ExcludedWildcard,
+            Enum::ExcludedSelective(..) => EnumDiscriminant::ExcludedSelective,
             _ => ::core::panicking::panic("internal error: entered unreachable code"),
         }
     }
 }
-fn check<T, U>()
-where
-    T: FromVariant<U> + IntoVariant<U> + From<U> + TryInto<U> + AsVariant<U>
-        + AsVariantRef<U> + AsVariantMut<U>,
-{}
-fn main() {
-    check::<Enum, VariantA>();
-    check::<Enum, VariantB>();
-}
+fn main() {}
