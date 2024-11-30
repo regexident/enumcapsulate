@@ -28,6 +28,7 @@ Please make sure to add your changes to the appropriate categories:
 - Made the enum-level `#[enumcapsulate(exclude(…))]` helper macros only have an effect on derives, when orchestrated through the `Encapsulate` derive macro.
 - Made `Encapsulate` derive macro no longer derive `VariantDiscriminant`.
 - Removed potentially confusing `#[enumcapsulate(include(…))]` helper attributes.
+- Merged `#[enumcapsulate(field(index = …))]` and `#[enumcapsulate(field(name = "…"))]` into a single polymorph `#[enumcapsulate(field = …)]`
 
 ### Deprecated
 

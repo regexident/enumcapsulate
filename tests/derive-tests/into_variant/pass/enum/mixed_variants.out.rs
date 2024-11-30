@@ -15,9 +15,9 @@ pub enum Enum {
     TwoStructFields { a: i32, b: u32 },
     #[enumcapsulate(exclude)]
     Excluded(VariantA, VariantB),
-    #[enumcapsulate(field(index = 1))]
+    #[enumcapsulate(field = 1)]
     IncludedTuple(i8, VariantC),
-    #[enumcapsulate(field(name = "variant"))]
+    #[enumcapsulate(field = "variant")]
     IncludedStruct { value: u8, variant: VariantD },
 }
 impl ::enumcapsulate::IntoVariant<VariantA> for Enum {

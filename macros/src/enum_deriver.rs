@@ -24,7 +24,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = FromDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -37,17 +37,17 @@ impl EnumDeriver {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
-            let variant_config = config_for_variant(variant)?;
+            let variant_config = FromDeriveVariantConfig::from_variant(variant)?;
 
             if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
-            let Some(selection_index) =
-                position_of_selected_field(&variant.fields, variant_config.field.as_ref())?
-            else {
+            if variant.fields.is_empty() {
                 continue;
-            };
+            }
+
+            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -102,7 +102,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = TryIntoDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -115,17 +115,17 @@ impl EnumDeriver {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
-            let variant_config = config_for_variant(variant)?;
+            let variant_config = TryIntoDeriveVariantConfig::from_variant(variant)?;
 
             if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
-            let Some(selection_index) =
-                position_of_selected_field(&variant.fields, variant_config.field.as_ref())?
-            else {
+            if variant.fields.is_empty() {
                 continue;
-            };
+            }
+
+            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -174,7 +174,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = FromVariantDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -187,17 +187,17 @@ impl EnumDeriver {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
-            let variant_config = config_for_variant(variant)?;
+            let variant_config = FromVariantDeriveVariantConfig::from_variant(variant)?;
 
             if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
-            let Some(selection_index) =
-                position_of_selected_field(&variant.fields, variant_config.field.as_ref())?
-            else {
+            if variant.fields.is_empty() {
                 continue;
-            };
+            }
+
+            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -252,7 +252,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = AsVariantDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -265,17 +265,17 @@ impl EnumDeriver {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
-            let variant_config = config_for_variant(variant)?;
+            let variant_config = AsVariantDeriveVariantConfig::from_variant(variant)?;
 
             if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
-            let Some(selection_index) =
-                position_of_selected_field(&variant.fields, variant_config.field.as_ref())?
-            else {
+            if variant.fields.is_empty() {
                 continue;
-            };
+            }
+
+            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -327,7 +327,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = AsVariantRefDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -340,17 +340,17 @@ impl EnumDeriver {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
-            let variant_config = config_for_variant(variant)?;
+            let variant_config = AsVariantRefDeriveVariantConfig::from_variant(variant)?;
 
             if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
-            let Some(selection_index) =
-                position_of_selected_field(&variant.fields, variant_config.field.as_ref())?
-            else {
+            if variant.fields.is_empty() {
                 continue;
-            };
+            }
+
+            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -397,7 +397,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = AsVariantMutDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -410,17 +410,17 @@ impl EnumDeriver {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
-            let variant_config = config_for_variant(variant)?;
+            let variant_config = AsVariantMutDeriveVariantConfig::from_variant(variant)?;
 
             if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
-            let Some(selection_index) =
-                position_of_selected_field(&variant.fields, variant_config.field.as_ref())?
-            else {
+            if variant.fields.is_empty() {
                 continue;
-            };
+            }
+
+            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -467,7 +467,7 @@ impl EnumDeriver {
 
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = IntoVariantDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -480,17 +480,17 @@ impl EnumDeriver {
             let variant_ident = &variant.ident;
             let inner = variant_ident;
 
-            let variant_config = config_for_variant(variant)?;
+            let variant_config = IntoVariantDeriveVariantConfig::from_variant(variant)?;
 
             if variant_config.is_excluded(DERIVE_MACRO_NAME) {
                 continue;
             }
 
-            let Some(selection_index) =
-                position_of_selected_field(&variant.fields, variant_config.field.as_ref())?
-            else {
+            if variant.fields.is_empty() {
                 continue;
-            };
+            }
+
+            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -535,7 +535,7 @@ impl EnumDeriver {
     pub fn derive_variant_downcast(&self) -> Result<TokenStream2, syn::Error> {
         let enum_ident = &self.item.ident;
 
-        let _enum_config = config_for_enum(&self.item)?;
+        let _enum_config = VariantDowncastDeriveEnumConfig::from_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -551,8 +551,6 @@ impl EnumDeriver {
 
     pub fn derive_variant_discriminant(&self) -> Result<TokenStream2, syn::Error> {
         let enum_ident = &self.item.ident;
-
-        let _enum_config = config_for_enum(&self.item)?;
 
         let outer = enum_ident;
         let outer_ty: Type = parse_quote_spanned! { outer.span() => #outer };
@@ -620,7 +618,7 @@ impl EnumDeriver {
     }
 
     pub fn derive_encapsulate(&self) -> Result<TokenStream2, syn::Error> {
-        let enum_config = encapsulate_config_for_enum(&self.item)?;
+        let enum_config = EncapsulateDeriveEnumConfig::from_enum(&self.item)?;
 
         let from = enum_config
             .is_included(macro_name::FROM)
