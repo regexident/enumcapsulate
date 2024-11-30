@@ -23,6 +23,27 @@ impl ::core::clone::Clone for RenamedDiscriminant {
     }
 }
 #[automatically_derived]
+impl ::core::cmp::Ord for RenamedDiscriminant {
+    #[inline]
+    fn cmp(&self, other: &RenamedDiscriminant) -> ::core::cmp::Ordering {
+        let __self_tag = ::core::intrinsics::discriminant_value(self);
+        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
+        ::core::cmp::Ord::cmp(&__self_tag, &__arg1_tag)
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::PartialOrd for RenamedDiscriminant {
+    #[inline]
+    fn partial_cmp(
+        &self,
+        other: &RenamedDiscriminant,
+    ) -> ::core::option::Option<::core::cmp::Ordering> {
+        let __self_tag = ::core::intrinsics::discriminant_value(self);
+        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
+        ::core::cmp::PartialOrd::partial_cmp(&__self_tag, &__arg1_tag)
+    }
+}
+#[automatically_derived]
 impl ::core::cmp::Eq for RenamedDiscriminant {
     #[inline]
     #[doc(hidden)]
