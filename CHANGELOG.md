@@ -20,7 +20,8 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
-- n/a
+- Added enum-level `#[enumcapsulate(discriminant(…))]` helper attribute for `VariantDiscriminant` derive macro, allowing for customizing `repr = …` and `name = …` for the generated enum.
+- Added variant-level `#[enumcapsulate(discriminant(…))]` helper attribute for `VariantDiscriminant` derive macro, allowing for customizing `value = …` and `name = …` for the generated variant.
 
 ### Changed
 
