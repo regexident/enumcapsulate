@@ -618,7 +618,7 @@ impl EnumDeriver {
 
         let discriminant_enum = quote! {
             #repr_attr
-            #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+            #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
             pub enum #discriminant_enum_ident {
                 #(#discriminant_variants)*
             }
