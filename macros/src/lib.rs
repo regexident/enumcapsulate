@@ -385,7 +385,6 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 ///     AsVariantMut,
 ///     AsVariantRef,
 ///     VariantDowncast,
-///     VariantDiscriminant,
 /// )]
 /// enum Enum {
 ///     // ...
