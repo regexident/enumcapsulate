@@ -39,6 +39,8 @@ The `enumcapsulate` crate exports the following corresponding derive macros, if 
 - `VariantDowncast`
 - `VariantDiscriminant`
 
+Find more information on above derive macros in `enumcapsulate-macros`'s own [README](./macros) file.
+
 ## Documentation
 
 Please refer to the documentation on [docs.rs](https://docs.rs/enumcapsulate).
