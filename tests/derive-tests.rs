@@ -115,3 +115,16 @@ mod encapsulate {
     // As such we only have to make sure in `pass()` that
     // it does actually derive what it says on the tin.
 }
+
+mod smoke {
+    #[test]
+    pub fn pass() {
+        tryexpand::expand(["tests/derive-tests/smoke/pass/**/*.rs"]).and_check();
+    }
+
+    // Failures are already covered by the tests of the individual
+    // derives that this umbrella derive delegates to.
+    //
+    // As such we only have to make sure in `pass()` that
+    // it does actually derive what it says on the tin.
+}

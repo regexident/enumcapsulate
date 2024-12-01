@@ -1,10 +1,12 @@
 use syn::LitStr;
 
 use crate::{
-    attr::{EXCLUDE, FIELD},
+    attr::{DISCRIMINANT, EXCLUDE, FIELD},
     config::ExcludeConfig,
     parse_enumcapsulate_attrs,
 };
+
+use super::DiscriminantConfig;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub(crate) enum FieldSelector {
@@ -14,6 +16,7 @@ pub(crate) enum FieldSelector {
 
 #[derive(Clone, Default)]
 pub(crate) struct VariantConfig {
+    discriminant: Option<DiscriminantConfig>,
     exclude: Option<ExcludeConfig>,
     field: Option<FieldSelector>,
 }
@@ -23,7 +26,13 @@ impl VariantConfig {
         let mut this = Self::default();
 
         parse_enumcapsulate_attrs(&variant.attrs, |meta| {
-            if meta.path.is_ident(EXCLUDE) {
+            if meta.path.is_ident(DISCRIMINANT) {
+                let mut discriminant = this.discriminant.take().unwrap_or_default();
+
+                discriminant.parse(&meta, variant)?;
+
+                this.discriminant = Some(discriminant);
+            } else if meta.path.is_ident(EXCLUDE) {
                 let mut exclude = this.exclude.take().unwrap_or_default();
 
                 exclude.parse(&meta, true)?;
@@ -49,14 +58,6 @@ impl VariantConfig {
         })?;
 
         Ok(this)
-    }
-
-    pub(crate) fn is_excluded(&self, name: &str) -> bool {
-        if let Some(excludes) = &self.exclude {
-            return excludes.is_excluded(name);
-        }
-
-        false
     }
 
     pub(crate) fn position_of_selected_field(
@@ -96,5 +97,13 @@ impl VariantConfig {
                 "multiple fields, please disambiguate via helper attribute",
             )),
         }
+    }
+
+    pub(crate) fn discriminant(&self) -> Option<&DiscriminantConfig> {
+        self.discriminant.as_ref()
+    }
+
+    pub(crate) fn exclude(&self) -> Option<&ExcludeConfig> {
+        self.exclude.as_ref()
     }
 }
