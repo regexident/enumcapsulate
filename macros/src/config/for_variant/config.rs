@@ -14,6 +14,12 @@ pub(crate) enum FieldSelector {
     Index(usize),
 }
 
+impl Default for FieldSelector {
+    fn default() -> Self {
+        Self::Index(0)
+    }
+}
+
 #[derive(Clone, Default)]
 pub(crate) struct VariantConfig {
     discriminant: Option<DiscriminantConfig>,
@@ -60,42 +66,41 @@ impl VariantConfig {
         Ok(this)
     }
 
-    pub(crate) fn position_of_selected_field(
+    pub(crate) fn selected_field<'a>(
         &self,
-        fields: &syn::Fields,
-    ) -> Result<usize, syn::Error> {
-        if let Some(selector) = &self.field {
-            match selector {
-                FieldSelector::Name(name) => {
-                    let position = fields
-                        .iter()
-                        .position(|field| {
-                            field
-                                .ident
-                                .as_ref()
-                                .map(|ident| ident == name)
-                                .unwrap_or(false)
-                        })
-                        .expect("field name should have been rejected");
+        fields: &'a syn::Fields,
+    ) -> Result<Option<(&'a syn::Field, usize)>, syn::Error> {
+        let default_field_selector = FieldSelector::default();
+        let field_selector = self.field.as_ref().unwrap_or(&default_field_selector);
 
-                    return Ok(position);
-                }
-                FieldSelector::Index(index) => {
-                    if *index >= fields.len() {
-                        return Err(syn::Error::new_spanned(fields, "field index out of bounds"));
-                    }
-                    return Ok(*index);
-                }
+        if fields.is_empty() {
+            return Ok(None);
+        }
+
+        match field_selector {
+            FieldSelector::Name(name) => {
+                let (index, field) = fields
+                    .iter()
+                    .enumerate()
+                    .find(|(_, field)| {
+                        field
+                            .ident
+                            .as_ref()
+                            .map(|ident| ident == name)
+                            .unwrap_or(false)
+                    })
+                    .expect("field name should have been rejected");
+
+                Ok(Some((field, index)))
             }
-        };
+            FieldSelector::Index(index) => {
+                let field = fields
+                    .iter()
+                    .nth(*index)
+                    .expect("field index should have been rejected");
 
-        match fields.len() {
-            0 => Err(syn::Error::new_spanned(fields, "no fields")),
-            1 => Ok(0),
-            _ => Err(syn::Error::new_spanned(
-                fields,
-                "multiple fields, please disambiguate via helper attribute",
-            )),
+                Ok(Some((field, *index)))
+            }
         }
     }
 
@@ -105,5 +110,10 @@ impl VariantConfig {
 
     pub(crate) fn exclude(&self) -> Option<&ExcludeConfig> {
         self.exclude.as_ref()
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn field(&self) -> Option<&FieldSelector> {
+        self.field.as_ref()
     }
 }

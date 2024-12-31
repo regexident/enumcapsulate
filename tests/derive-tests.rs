@@ -100,7 +100,10 @@ mod variant_discriminant {
         tryexpand::expand(["tests/derive-tests/variant_discriminant/pass/**/*.rs"]).and_check();
     }
 
-    // There should be no failures for this derive macro;
+    #[test]
+    pub fn fail() {
+        tryexpand::expand(["tests/derive-tests/variant_discriminant/fail/**/*.rs"]).expect_fail();
+    }
 }
 
 mod encapsulate {

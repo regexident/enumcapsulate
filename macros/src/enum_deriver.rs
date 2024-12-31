@@ -45,24 +45,23 @@ impl EnumDeriver {
                 }
             }
 
-            if variant.fields.is_empty() {
+            let Some((selected_field, selection_index)) =
+                variant_config.selected_field(&variant.fields)?
+            else {
                 continue;
-            }
+            };
 
-            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
-
-            let fields: Vec<_> = variant.fields.iter().collect();
-            let inner_field = fields[selection_index];
-            let inner_ty = &inner_field.ty;
+            let inner_ty = &selected_field.ty;
 
             if self.uses_generic_const_or_type(inner_ty) {
                 continue;
             }
 
-            let field_expressions: Vec<_> = fields
+            let field_expressions: Vec<_> = variant
+                .fields
                 .iter()
                 .enumerate()
-                .map(|(field_index, &field)| {
+                .map(|(field_index, field)| {
                     let expr = if field_index == selection_index {
                         quote! { inner }
                     } else {
@@ -125,16 +124,14 @@ impl EnumDeriver {
                 }
             }
 
-            if variant.fields.is_empty() {
+            let Some((selected_field, selection_index)) =
+                variant_config.selected_field(&variant.fields)?
+            else {
                 continue;
-            }
+            };
 
-            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
-
-            let fields: Vec<_> = variant.fields.iter().collect();
-            let inner_field = fields[selection_index];
-            let inner_ident = inner_field.ident.as_ref();
-            let inner_ty = &inner_field.ty;
+            let inner_ident = selected_field.ident.as_ref();
+            let inner_ty = &selected_field.ty;
 
             if self.uses_generic_const_or_type(inner_ty) {
                 continue;
@@ -199,24 +196,23 @@ impl EnumDeriver {
                 }
             }
 
-            if variant.fields.is_empty() {
+            let Some((selected_field, selection_index)) =
+                variant_config.selected_field(&variant.fields)?
+            else {
                 continue;
-            }
+            };
 
-            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
-
-            let fields: Vec<_> = variant.fields.iter().collect();
-            let inner_field = fields[selection_index];
-            let inner_ty = &inner_field.ty;
+            let inner_ty = &selected_field.ty;
 
             if self.uses_generic_const_or_type(inner_ty) {
                 continue;
             }
 
-            let field_expressions: Vec<_> = fields
+            let field_expressions: Vec<_> = variant
+                .fields
                 .iter()
                 .enumerate()
-                .map(|(field_index, &field)| {
+                .map(|(field_index, field)| {
                     let expr = if field_index == selection_index {
                         quote! { inner }
                     } else {
@@ -279,16 +275,14 @@ impl EnumDeriver {
                 }
             }
 
-            if variant.fields.is_empty() {
+            let Some((selected_field, selection_index)) =
+                variant_config.selected_field(&variant.fields)?
+            else {
                 continue;
-            }
+            };
 
-            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
-
-            let fields: Vec<_> = variant.fields.iter().collect();
-            let inner_field = fields[selection_index];
-            let inner_ident = inner_field.ident.as_ref();
-            let inner_ty = &inner_field.ty;
+            let inner_ident = selected_field.ident.as_ref();
+            let inner_ty = &selected_field.ty;
 
             if self.uses_generic_const_or_type(inner_ty) {
                 continue;
@@ -356,34 +350,18 @@ impl EnumDeriver {
                 }
             }
 
-            if variant.fields.is_empty() {
+            let Some(field_selection) = variant_config.selected_field(&variant.fields)? else {
                 continue;
-            }
+            };
 
-            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
-
-            let fields: Vec<_> = variant.fields.iter().collect();
-            let inner_field = fields[selection_index];
-            let inner_ident = inner_field.ident.as_ref();
-            let inner_ty = &inner_field.ty;
+            let inner_ty = &field_selection.0.ty;
 
             if self.uses_generic_const_or_type(inner_ty) {
                 continue;
             }
 
-            let pattern = match &variant.fields {
-                Fields::Named(_) => {
-                    let field = inner_ident;
-                    quote! { #outer_ty::#inner { #field: inner, .. } }
-                }
-                Fields::Unnamed(_) => {
-                    let underscores = (0..selection_index).map(|_| {
-                        quote! { _, }
-                    });
-                    quote! { #outer_ty::#inner(#(#underscores)* inner, ..) }
-                }
-                Fields::Unit => continue,
-            };
+            let field_pattern = self.field_pattern(&variant.fields, field_selection);
+            let pattern = quote! { #outer_ty::#inner #field_pattern };
 
             impls.push(quote! {
                 impl #impl_generics ::enumcapsulate::AsVariantRef<#inner_ty> for #outer_ty #type_generics #where_clause {
@@ -428,34 +406,18 @@ impl EnumDeriver {
                 }
             }
 
-            if variant.fields.is_empty() {
+            let Some(field_selection) = variant_config.selected_field(&variant.fields)? else {
                 continue;
-            }
+            };
 
-            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
-
-            let fields: Vec<_> = variant.fields.iter().collect();
-            let inner_field = fields[selection_index];
-            let inner_ident = inner_field.ident.as_ref();
-            let inner_ty = &inner_field.ty;
+            let inner_ty = &field_selection.0.ty;
 
             if self.uses_generic_const_or_type(inner_ty) {
                 continue;
             }
 
-            let pattern = match &variant.fields {
-                Fields::Named(_) => {
-                    let field = inner_ident;
-                    quote! { #outer_ty::#inner { #field: inner, .. } }
-                }
-                Fields::Unnamed(_) => {
-                    let underscores = (0..selection_index).map(|_| {
-                        quote! { _, }
-                    });
-                    quote! { #outer_ty::#inner(#(#underscores)* inner, ..) }
-                }
-                Fields::Unit => continue,
-            };
+            let field_pattern = self.field_pattern(&variant.fields, field_selection);
+            let pattern = quote! { #outer_ty::#inner #field_pattern };
 
             impls.push(quote! {
                 impl #impl_generics ::enumcapsulate::AsVariantMut<#inner_ty> for #outer_ty #type_generics #where_clause {
@@ -500,11 +462,11 @@ impl EnumDeriver {
                 }
             }
 
-            if variant.fields.is_empty() {
+            let Some((_selected_field, selection_index)) =
+                variant_config.selected_field(&variant.fields)?
+            else {
                 continue;
-            }
-
-            let selection_index = variant_config.position_of_selected_field(&variant.fields)?;
+            };
 
             let fields: Vec<_> = variant.fields.iter().collect();
             let inner_field = fields[selection_index];
@@ -592,14 +554,18 @@ impl EnumDeriver {
         let mut discriminant_variants: Vec<TokenStream2> = vec![];
         let mut match_arms: Vec<TokenStream2> = vec![];
 
-        for variant in &variants {
-            let variant_config = VariantConfig::from_variant(variant)?;
+        let variant_configs: Vec<VariantConfig> = variants
+            .iter()
+            .map(|variant| VariantConfig::from_variant(variant))
+            .collect::<Result<_, _>>()?;
 
+        for (variant, variant_config) in variants.into_iter().zip(variant_configs) {
             let variant_ident: &syn::Ident = &variant.ident;
 
             let mut discriminant_variant_ident: syn::Ident = variant_ident.clone();
             let mut discriminant_variant_expr: Option<&syn::Expr> =
                 variant.discriminant.as_ref().map(|(_, expr)| expr);
+            let mut discriminant_variant_nested: Option<&syn::Path> = None;
 
             if let Some(discriminant_config) = variant_config.discriminant() {
                 if let Some(ident) = discriminant_config.ident() {
@@ -609,31 +575,55 @@ impl EnumDeriver {
                 if let Some(expr) = discriminant_config.expr() {
                     discriminant_variant_expr = Some(expr);
                 }
+
+                if let Some(nested) = discriminant_config.nested() {
+                    discriminant_variant_nested = Some(nested);
+                }
             }
 
-            let variant_discriminant = discriminant_variant_expr.map(|expr| {
+            let variant_is_nested = discriminant_variant_nested.is_some();
+
+            let variant_discriminant_expr = discriminant_variant_expr.map(|expr| {
                 quote! { = #expr }
             });
+
+            let variant_discriminant_nested = discriminant_variant_nested.map(|path| {
+                quote! { (#path) }
+            });
+
+            let variant_discriminant = variant_discriminant_expr.or(variant_discriminant_nested);
 
             discriminant_variants.push(quote! {
                 #discriminant_variant_ident #variant_discriminant,
             });
 
-            let pattern = match &variant.fields {
-                Fields::Named(_) => quote! {
-                    #enum_ident::#variant_ident { .. }
-                },
-                Fields::Unnamed(_) => quote! {
-                    #enum_ident::#variant_ident(..)
-                },
-                Fields::Unit => quote! {
-                    #enum_ident::#variant_ident
-                },
+            let field_selection = variant_config.selected_field(&variant.fields)?;
+            assert_eq!(field_selection.is_none(), variant.fields.is_empty());
+
+            let field_pattern = if variant_is_nested {
+                let (field, index) = field_selection.unwrap();
+                self.field_pattern(&variant.fields, (field, index))
+            } else {
+                self.ignored_field_pattern(&variant.fields)
             };
 
-            match_arms.push(quote! {
-                #pattern => #discriminant_enum_ident::#discriminant_variant_ident,
-            });
+            let pattern = quote! {
+                #enum_ident::#variant_ident #field_pattern
+            };
+
+            let match_arm = if variant_is_nested {
+                quote! {
+                    #pattern => #discriminant_enum_ident::#discriminant_variant_ident(
+                        inner.variant_discriminant()
+                    ),
+                }
+            } else {
+                quote! {
+                    #pattern => #discriminant_enum_ident::#discriminant_variant_ident,
+                }
+            };
+
+            match_arms.push(match_arm);
         }
 
         let discriminant_enum = quote! {
@@ -698,6 +688,35 @@ impl EnumDeriver {
             #into_variant
             #variant_downcast
         })
+    }
+
+    fn field_pattern(
+        &self,
+        fields: &syn::Fields,
+        selected_field: (&syn::Field, usize),
+    ) -> TokenStream2 {
+        let (field, index) = selected_field;
+        match fields {
+            Fields::Named(_) => {
+                let ident = field.ident.as_ref().expect("field should be named");
+                quote! { { #ident: inner, .. } }
+            }
+            Fields::Unnamed(_) => {
+                let underscores = (0..index).map(|_| {
+                    quote! { _, }
+                });
+                quote! { (#(#underscores)* inner, ..) }
+            }
+            Fields::Unit => quote! {},
+        }
+    }
+
+    fn ignored_field_pattern(&self, fields: &syn::Fields) -> TokenStream2 {
+        match fields {
+            Fields::Named(_) => quote! { { .. } },
+            Fields::Unnamed(_) => quote! { (..) },
+            Fields::Unit => quote! {},
+        }
     }
 
     fn uses_generic_const_or_type(&self, ty: &syn::Type) -> bool {
