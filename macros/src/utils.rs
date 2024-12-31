@@ -9,6 +9,7 @@ pub(crate) mod attr {
     pub(crate) const FIELD: &str = "field";
     pub(crate) const NAME: &str = "name";
     pub(crate) const NAMESPACE: &str = "enumcapsulate";
+    pub(crate) const NESTED: &str = "nested";
     pub(crate) const REPR: &str = "repr";
     pub(crate) const VALUE: &str = "value";
 }
