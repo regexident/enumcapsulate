@@ -50,6 +50,12 @@ Please make sure to add your changes to the appropriate categories:
 
 - n/a
 
+## [0.6.0] - 2024-12-31
+
+### Added
+
+- Added support for nested variant discriminants via variant-level `#[enumcapsulate(discriminant(nested = …))]` helper attribute for `VariantDiscriminant` derive macro, allowing for specifying a type of the sub-discriminant for the generated variant.
+
 ## [0.5.0] - 2024-12-01
 
 ### Added
