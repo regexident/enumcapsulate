@@ -4,8 +4,8 @@ use crate::attr::{NAME, NESTED, VALUE};
 
 #[derive(Clone, Default)]
 pub(crate) struct DiscriminantConfig {
-    expr: Option<syn::Expr>,
-    ident: Option<syn::Ident>,
+    value: Option<syn::Expr>,
+    name: Option<syn::Ident>,
     nested: Option<syn::Path>,
 }
 
@@ -17,25 +17,25 @@ impl DiscriminantConfig {
     ) -> Result<(), syn::Error> {
         meta.parse_nested_meta(|meta| {
             if meta.path.is_ident(VALUE) {
-                if self.expr.is_some() {
+                if self.value.is_some() {
                     return Err(meta.error("`value = …` already specified"));
                 } else if self.nested.is_some() {
                     return Err(meta.error("conflicting with use of `nesting = …`"));
                 }
 
-                self.expr = Some(meta.value()?.parse()?);
+                self.value = Some(meta.value()?.parse()?);
             } else if meta.path.is_ident(NAME) {
-                if self.ident.is_some() {
+                if self.name.is_some() {
                     return Err(meta.error("`name = …` already specified"));
                 }
 
-                self.ident = Some(meta.value()?.parse()?);
+                self.name = Some(meta.value()?.parse()?);
             } else if meta.path.is_ident(NESTED) {
                 if matches!(variant.fields, syn::Fields::Unit) {
                     return Err(meta.error("no field found on variant"));
                 } else if self.nested.is_some() {
                     return Err(meta.error("`nested = …` already specified"));
-                } else if self.expr.is_some() {
+                } else if self.value.is_some() {
                     return Err(meta.error("conflicting with use of `value = …`"));
                 }
 
@@ -49,11 +49,11 @@ impl DiscriminantConfig {
     }
 
     pub(crate) fn expr(&self) -> Option<&syn::Expr> {
-        self.expr.as_ref()
+        self.value.as_ref()
     }
 
     pub(crate) fn ident(&self) -> Option<&syn::Ident> {
-        self.ident.as_ref()
+        self.name.as_ref()
     }
 
     pub(crate) fn nested(&self) -> Option<&syn::Path> {

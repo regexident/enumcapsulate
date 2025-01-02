@@ -5,7 +5,7 @@ use crate::attr::{NAME, REPR};
 #[derive(Clone, Default)]
 pub(crate) struct DiscriminantConfig {
     repr: Option<syn::Type>,
-    ident: Option<syn::Ident>,
+    name: Option<syn::Ident>,
 }
 
 impl DiscriminantConfig {
@@ -22,11 +22,11 @@ impl DiscriminantConfig {
 
                 self.repr = Some(meta.value()?.parse()?);
             } else if meta.path.is_ident(NAME) {
-                if self.ident.is_some() {
+                if self.name.is_some() {
                     return Err(meta.error("name already specified"));
                 }
 
-                self.ident = Some(meta.value()?.parse()?);
+                self.name = Some(meta.value()?.parse()?);
             } else {
                 return Err(meta.error("unsupported discriminant attribute"));
             }
@@ -40,6 +40,6 @@ impl DiscriminantConfig {
     }
 
     pub(crate) fn ident(&self) -> Option<&syn::Ident> {
-        self.ident.as_ref()
+        self.name.as_ref()
     }
 }
