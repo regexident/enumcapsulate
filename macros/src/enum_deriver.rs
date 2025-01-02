@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{parse_quote_spanned, visit::Visit as _, Fields, Type, Variant};
+use syn::{parse_quote, parse_quote_spanned, visit::Visit as _, Fields, Type, Variant};
 
 use crate::*;
 
@@ -562,10 +562,13 @@ impl EnumDeriver {
         for (variant, variant_config) in variants.into_iter().zip(variant_configs) {
             let variant_ident: &syn::Ident = &variant.ident;
 
+            let field_selection = variant_config.selected_field(&variant.fields)?;
+            assert_eq!(field_selection.is_none(), variant.fields.is_empty());
+
             let mut discriminant_variant_ident: syn::Ident = variant_ident.clone();
             let mut discriminant_variant_expr: Option<&syn::Expr> =
                 variant.discriminant.as_ref().map(|(_, expr)| expr);
-            let mut discriminant_variant_nested: Option<&syn::Path> = None;
+            let mut discriminant_variant_nested: Option<syn::Type> = None;
 
             if let Some(discriminant_config) = variant_config.discriminant() {
                 if let Some(ident) = discriminant_config.ident() {
@@ -576,8 +579,13 @@ impl EnumDeriver {
                     discriminant_variant_expr = Some(expr);
                 }
 
-                if let Some(nested) = discriminant_config.nested() {
-                    discriminant_variant_nested = Some(nested);
+                if discriminant_config.nested() {
+                    let (field, _) = field_selection.expect("no selected field found");
+                    let ty = &field.ty;
+                    let nested_type = parse_quote! {
+                        <#ty as ::enumcapsulate::VariantDiscriminant>::Discriminant
+                    };
+                    discriminant_variant_nested = Some(nested_type);
                 }
             }
 
@@ -596,9 +604,6 @@ impl EnumDeriver {
             discriminant_variants.push(quote! {
                 #discriminant_variant_ident #variant_discriminant,
             });
-
-            let field_selection = variant_config.selected_field(&variant.fields)?;
-            assert_eq!(field_selection.is_none(), variant.fields.is_empty());
 
             let field_pattern = if variant_is_nested {
                 let (field, index) = field_selection.unwrap();

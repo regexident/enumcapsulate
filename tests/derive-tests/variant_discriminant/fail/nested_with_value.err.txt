@@ -1,6 +1,6 @@
-error: conflicting with use of `nesting = …`
-  --> /tests/derive-tests/variant_discriminant/fail/nested_with_value.rs:11:65
+error: conflicting with use of `nesting`
+  --> /tests/derive-tests/variant_discriminant/fail/nested_with_value.rs:11:42
    |
-11 |     #[enumcapsulate(discriminant(nested = VariantADiscriminant, value = 42))]
-   |                                                                 ^^^^^
+11 |     #[enumcapsulate(discriminant(nested, value = 42))]
+   |                                          ^^^^^
 error: could not compile `<CRATE>` (bin "<BIN>") due to 1 previous error

@@ -1,6 +1,6 @@
 error: no field found on variant
  --> /tests/derive-tests/variant_discriminant/fail/nested_on_unit_variant.rs:5:34
   |
-5 |     #[enumcapsulate(discriminant(nested = VariantADiscriminant, value = 42))]
+5 |     #[enumcapsulate(discriminant(nested, value = 42))]
   |                                  ^^^^^^
 error: could not compile `<CRATE>` (bin "<BIN>") due to 1 previous error

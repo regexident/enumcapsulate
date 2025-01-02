@@ -24,13 +24,13 @@ pub enum Enum {
     VariantA,
     #[enumcapsulate(discriminant(value = 42))]
     VariantB,
-    #[enumcapsulate(discriminant(nested = VariantCDiscriminant))]
+    #[enumcapsulate(discriminant(nested))]
     VariantC {
         c: VariantC,
     },
-    #[enumcapsulate(discriminant(name = RenamedVariant, nested = VariantDDiscriminant))]
+    #[enumcapsulate(discriminant(name = RenamedVariant, nested))]
     VariantD(VariantD),
-    #[enumcapsulate(field = 1, discriminant(nested = VariantEDiscriminant))]
+    #[enumcapsulate(field = 1, discriminant(nested))]
     VariantE(bool, VariantE),
 }
 
