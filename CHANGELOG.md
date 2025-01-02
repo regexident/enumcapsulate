@@ -24,7 +24,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- Changed the `#[enumcapsulate(discriminant(nested))]` variant attribute into a value-less unit attribute (`nested`), removing the previously required explicit type argument (`nested = <Type>`).
+- n/a
 
 ### Deprecated
 
@@ -49,6 +49,12 @@ Please make sure to add your changes to the appropriate categories:
 ### Other
 
 - n/a
+
+## [0.6.1] - 2025-01-02
+
+### Changed
+
+- Changed the `#[enumcapsulate(discriminant(nested))]` variant attribute into a value-less unit attribute (`nested`), removing the previously required explicit type argument (`nested = <Type>`).
 
 ## [0.6.0] - 2024-12-31
 
