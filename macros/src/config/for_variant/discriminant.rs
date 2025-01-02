@@ -6,7 +6,7 @@ use crate::attr::{NAME, NESTED, VALUE};
 pub(crate) struct DiscriminantConfig {
     value: Option<syn::Expr>,
     name: Option<syn::Ident>,
-    nested: Option<syn::Path>,
+    nested: bool,
 }
 
 impl DiscriminantConfig {
@@ -19,8 +19,8 @@ impl DiscriminantConfig {
             if meta.path.is_ident(VALUE) {
                 if self.value.is_some() {
                     return Err(meta.error("`value = …` already specified"));
-                } else if self.nested.is_some() {
-                    return Err(meta.error("conflicting with use of `nesting = …`"));
+                } else if self.nested {
+                    return Err(meta.error("conflicting with use of `nesting`"));
                 }
 
                 self.value = Some(meta.value()?.parse()?);
@@ -33,13 +33,13 @@ impl DiscriminantConfig {
             } else if meta.path.is_ident(NESTED) {
                 if matches!(variant.fields, syn::Fields::Unit) {
                     return Err(meta.error("no field found on variant"));
-                } else if self.nested.is_some() {
-                    return Err(meta.error("`nested = …` already specified"));
+                } else if self.nested {
+                    return Err(meta.error("`nested` already specified"));
                 } else if self.value.is_some() {
                     return Err(meta.error("conflicting with use of `value = …`"));
                 }
 
-                self.nested = Some(meta.value()?.parse()?);
+                self.nested = true;
             } else {
                 return Err(meta.error("unsupported discriminant attribute"));
             }
@@ -56,7 +56,7 @@ impl DiscriminantConfig {
         self.name.as_ref()
     }
 
-    pub(crate) fn nested(&self) -> Option<&syn::Path> {
-        self.nested.as_ref()
+    pub(crate) fn nested(&self) -> bool {
+        self.nested
     }
 }

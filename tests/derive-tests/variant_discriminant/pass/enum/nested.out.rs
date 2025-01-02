@@ -265,20 +265,20 @@ pub enum Enum {
     VariantA,
     #[enumcapsulate(discriminant(value = 42))]
     VariantB,
-    #[enumcapsulate(discriminant(nested = VariantCDiscriminant))]
+    #[enumcapsulate(discriminant(nested))]
     VariantC { c: VariantC },
-    #[enumcapsulate(discriminant(name = RenamedVariant, nested = VariantDDiscriminant))]
+    #[enumcapsulate(discriminant(name = RenamedVariant, nested))]
     VariantD(VariantD),
-    #[enumcapsulate(field = 1, discriminant(nested = VariantEDiscriminant))]
+    #[enumcapsulate(field = 1, discriminant(nested))]
     VariantE(bool, VariantE),
 }
 #[repr(u8)]
 pub enum EnumDiscriminant {
     VariantA,
     VariantB = 42,
-    VariantC(VariantCDiscriminant),
-    RenamedVariant(VariantDDiscriminant),
-    VariantE(VariantEDiscriminant),
+    VariantC(<VariantC as ::enumcapsulate::VariantDiscriminant>::Discriminant),
+    RenamedVariant(<VariantD as ::enumcapsulate::VariantDiscriminant>::Discriminant),
+    VariantE(<VariantE as ::enumcapsulate::VariantDiscriminant>::Discriminant),
 }
 #[automatically_derived]
 impl ::core::marker::Copy for EnumDiscriminant {}
@@ -286,9 +286,15 @@ impl ::core::marker::Copy for EnumDiscriminant {}
 impl ::core::clone::Clone for EnumDiscriminant {
     #[inline]
     fn clone(&self) -> EnumDiscriminant {
-        let _: ::core::clone::AssertParamIsClone<VariantCDiscriminant>;
-        let _: ::core::clone::AssertParamIsClone<VariantDDiscriminant>;
-        let _: ::core::clone::AssertParamIsClone<VariantEDiscriminant>;
+        let _: ::core::clone::AssertParamIsClone<
+            <VariantC as ::enumcapsulate::VariantDiscriminant>::Discriminant,
+        >;
+        let _: ::core::clone::AssertParamIsClone<
+            <VariantD as ::enumcapsulate::VariantDiscriminant>::Discriminant,
+        >;
+        let _: ::core::clone::AssertParamIsClone<
+            <VariantE as ::enumcapsulate::VariantDiscriminant>::Discriminant,
+        >;
         *self
     }
 }
@@ -352,9 +358,15 @@ impl ::core::cmp::Eq for EnumDiscriminant {
     #[doc(hidden)]
     #[coverage(off)]
     fn assert_receiver_is_total_eq(&self) -> () {
-        let _: ::core::cmp::AssertParamIsEq<VariantCDiscriminant>;
-        let _: ::core::cmp::AssertParamIsEq<VariantDDiscriminant>;
-        let _: ::core::cmp::AssertParamIsEq<VariantEDiscriminant>;
+        let _: ::core::cmp::AssertParamIsEq<
+            <VariantC as ::enumcapsulate::VariantDiscriminant>::Discriminant,
+        >;
+        let _: ::core::cmp::AssertParamIsEq<
+            <VariantD as ::enumcapsulate::VariantDiscriminant>::Discriminant,
+        >;
+        let _: ::core::cmp::AssertParamIsEq<
+            <VariantE as ::enumcapsulate::VariantDiscriminant>::Discriminant,
+        >;
     }
 }
 #[automatically_derived]

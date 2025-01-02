@@ -87,7 +87,7 @@ impl ::enumcapsulate::VariantDiscriminant for VariantA {
     }
 }
 pub enum Enum {
-    #[enumcapsulate(discriminant(nested = VariantADiscriminant, value = 42))]
+    #[enumcapsulate(discriminant(nested, value = 42))]
     VariantA(VariantA),
 }
 fn main() {}
