@@ -1,0 +1,6 @@
+error: generic fields require an explicit nested discriminant type
+  --> /tests/derive-tests/variant_discriminant/fail/nested_generic_field.rs:12:14
+   |
+12 |     VariantA(VariantA<T>),
+   |              ^^^^^^^^
+error: could not compile `<CRATE>` (bin "<BIN>") due to 1 previous error

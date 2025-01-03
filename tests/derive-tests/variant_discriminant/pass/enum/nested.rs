@@ -2,25 +2,22 @@ use enumcapsulate::VariantDiscriminant;
 
 #[derive(VariantDiscriminant)]
 pub enum VariantC {
-    VariantC1,
-    VariantC2,
+    Variant,
 }
 
 #[derive(VariantDiscriminant)]
 pub enum VariantD {
-    VariantD1,
-    VariantD2,
+    Variant,
 }
 
 #[derive(VariantDiscriminant)]
-pub enum VariantE {
-    VariantE1,
-    VariantE2,
+pub enum VariantE<T> {
+    Variant(T),
 }
 
 #[derive(VariantDiscriminant)]
 #[enumcapsulate(discriminant(repr = u8))]
-pub enum Enum {
+pub enum Enum<T> {
     VariantA,
     #[enumcapsulate(discriminant(value = 42))]
     VariantB,
@@ -30,8 +27,8 @@ pub enum Enum {
     },
     #[enumcapsulate(discriminant(name = RenamedVariant, nested))]
     VariantD(VariantD),
-    #[enumcapsulate(field = 1, discriminant(nested))]
-    VariantE(bool, VariantE),
+    #[enumcapsulate(field = 1, discriminant(nested = VariantEDiscriminant))]
+    VariantE(bool, VariantE<T>),
 }
 
 fn main() {}

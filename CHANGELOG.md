@@ -24,7 +24,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- n/a
+- Re-introduced type argument (`nested = <Type>`) of `#[enumcapsulate(discriminant(nested))]` variant attribute, but as an optional argument (required for fields using the parent enum's generic parameters).
 
 ### Deprecated
 

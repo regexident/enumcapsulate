@@ -1,11 +1,9 @@
 use enumcapsulate::VariantDiscriminant;
 pub enum VariantC {
-    VariantC1,
-    VariantC2,
+    Variant,
 }
 pub enum VariantCDiscriminant {
-    VariantC1,
-    VariantC2,
+    Variant,
 }
 #[automatically_derived]
 impl ::core::marker::Copy for VariantCDiscriminant {}
@@ -20,9 +18,7 @@ impl ::core::clone::Clone for VariantCDiscriminant {
 impl ::core::cmp::Ord for VariantCDiscriminant {
     #[inline]
     fn cmp(&self, other: &VariantCDiscriminant) -> ::core::cmp::Ordering {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::Ord::cmp(&__self_tag, &__arg1_tag)
+        ::core::cmp::Ordering::Equal
     }
 }
 #[automatically_derived]
@@ -32,9 +28,7 @@ impl ::core::cmp::PartialOrd for VariantCDiscriminant {
         &self,
         other: &VariantCDiscriminant,
     ) -> ::core::option::Option<::core::cmp::Ordering> {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::PartialOrd::partial_cmp(&__self_tag, &__arg1_tag)
+        ::core::option::Option::Some(::core::cmp::Ordering::Equal)
     }
 }
 #[automatically_derived]
@@ -50,49 +44,35 @@ impl ::core::marker::StructuralPartialEq for VariantCDiscriminant {}
 impl ::core::cmp::PartialEq for VariantCDiscriminant {
     #[inline]
     fn eq(&self, other: &VariantCDiscriminant) -> bool {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        __self_tag == __arg1_tag
+        true
     }
 }
 #[automatically_derived]
 impl ::core::hash::Hash for VariantCDiscriminant {
     #[inline]
-    fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        ::core::hash::Hash::hash(&__self_tag, state)
-    }
+    fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {}
 }
 #[automatically_derived]
 impl ::core::fmt::Debug for VariantCDiscriminant {
     #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-        ::core::fmt::Formatter::write_str(
-            f,
-            match self {
-                VariantCDiscriminant::VariantC1 => "VariantC1",
-                VariantCDiscriminant::VariantC2 => "VariantC2",
-            },
-        )
+        ::core::fmt::Formatter::write_str(f, "Variant")
     }
 }
 impl ::enumcapsulate::VariantDiscriminant for VariantC {
     type Discriminant = VariantCDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {
-            VariantC::VariantC1 => VariantCDiscriminant::VariantC1,
-            VariantC::VariantC2 => VariantCDiscriminant::VariantC2,
+            VariantC::Variant => VariantCDiscriminant::Variant,
             _ => ::core::panicking::panic("internal error: entered unreachable code"),
         }
     }
 }
 pub enum VariantD {
-    VariantD1,
-    VariantD2,
+    Variant,
 }
 pub enum VariantDDiscriminant {
-    VariantD1,
-    VariantD2,
+    Variant,
 }
 #[automatically_derived]
 impl ::core::marker::Copy for VariantDDiscriminant {}
@@ -107,9 +87,7 @@ impl ::core::clone::Clone for VariantDDiscriminant {
 impl ::core::cmp::Ord for VariantDDiscriminant {
     #[inline]
     fn cmp(&self, other: &VariantDDiscriminant) -> ::core::cmp::Ordering {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::Ord::cmp(&__self_tag, &__arg1_tag)
+        ::core::cmp::Ordering::Equal
     }
 }
 #[automatically_derived]
@@ -119,9 +97,7 @@ impl ::core::cmp::PartialOrd for VariantDDiscriminant {
         &self,
         other: &VariantDDiscriminant,
     ) -> ::core::option::Option<::core::cmp::Ordering> {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::PartialOrd::partial_cmp(&__self_tag, &__arg1_tag)
+        ::core::option::Option::Some(::core::cmp::Ordering::Equal)
     }
 }
 #[automatically_derived]
@@ -137,49 +113,35 @@ impl ::core::marker::StructuralPartialEq for VariantDDiscriminant {}
 impl ::core::cmp::PartialEq for VariantDDiscriminant {
     #[inline]
     fn eq(&self, other: &VariantDDiscriminant) -> bool {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        __self_tag == __arg1_tag
+        true
     }
 }
 #[automatically_derived]
 impl ::core::hash::Hash for VariantDDiscriminant {
     #[inline]
-    fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        ::core::hash::Hash::hash(&__self_tag, state)
-    }
+    fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {}
 }
 #[automatically_derived]
 impl ::core::fmt::Debug for VariantDDiscriminant {
     #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-        ::core::fmt::Formatter::write_str(
-            f,
-            match self {
-                VariantDDiscriminant::VariantD1 => "VariantD1",
-                VariantDDiscriminant::VariantD2 => "VariantD2",
-            },
-        )
+        ::core::fmt::Formatter::write_str(f, "Variant")
     }
 }
 impl ::enumcapsulate::VariantDiscriminant for VariantD {
     type Discriminant = VariantDDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {
-            VariantD::VariantD1 => VariantDDiscriminant::VariantD1,
-            VariantD::VariantD2 => VariantDDiscriminant::VariantD2,
+            VariantD::Variant => VariantDDiscriminant::Variant,
             _ => ::core::panicking::panic("internal error: entered unreachable code"),
         }
     }
 }
-pub enum VariantE {
-    VariantE1,
-    VariantE2,
+pub enum VariantE<T> {
+    Variant(T),
 }
 pub enum VariantEDiscriminant {
-    VariantE1,
-    VariantE2,
+    Variant,
 }
 #[automatically_derived]
 impl ::core::marker::Copy for VariantEDiscriminant {}
@@ -194,9 +156,7 @@ impl ::core::clone::Clone for VariantEDiscriminant {
 impl ::core::cmp::Ord for VariantEDiscriminant {
     #[inline]
     fn cmp(&self, other: &VariantEDiscriminant) -> ::core::cmp::Ordering {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::Ord::cmp(&__self_tag, &__arg1_tag)
+        ::core::cmp::Ordering::Equal
     }
 }
 #[automatically_derived]
@@ -206,9 +166,7 @@ impl ::core::cmp::PartialOrd for VariantEDiscriminant {
         &self,
         other: &VariantEDiscriminant,
     ) -> ::core::option::Option<::core::cmp::Ordering> {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::PartialOrd::partial_cmp(&__self_tag, &__arg1_tag)
+        ::core::option::Option::Some(::core::cmp::Ordering::Equal)
     }
 }
 #[automatically_derived]
@@ -224,44 +182,32 @@ impl ::core::marker::StructuralPartialEq for VariantEDiscriminant {}
 impl ::core::cmp::PartialEq for VariantEDiscriminant {
     #[inline]
     fn eq(&self, other: &VariantEDiscriminant) -> bool {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        __self_tag == __arg1_tag
+        true
     }
 }
 #[automatically_derived]
 impl ::core::hash::Hash for VariantEDiscriminant {
     #[inline]
-    fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        ::core::hash::Hash::hash(&__self_tag, state)
-    }
+    fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {}
 }
 #[automatically_derived]
 impl ::core::fmt::Debug for VariantEDiscriminant {
     #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-        ::core::fmt::Formatter::write_str(
-            f,
-            match self {
-                VariantEDiscriminant::VariantE1 => "VariantE1",
-                VariantEDiscriminant::VariantE2 => "VariantE2",
-            },
-        )
+        ::core::fmt::Formatter::write_str(f, "Variant")
     }
 }
-impl ::enumcapsulate::VariantDiscriminant for VariantE {
+impl<T> ::enumcapsulate::VariantDiscriminant for VariantE<T> {
     type Discriminant = VariantEDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {
-            VariantE::VariantE1 => VariantEDiscriminant::VariantE1,
-            VariantE::VariantE2 => VariantEDiscriminant::VariantE2,
+            VariantE::Variant(..) => VariantEDiscriminant::Variant,
             _ => ::core::panicking::panic("internal error: entered unreachable code"),
         }
     }
 }
 #[enumcapsulate(discriminant(repr = u8))]
-pub enum Enum {
+pub enum Enum<T> {
     VariantA,
     #[enumcapsulate(discriminant(value = 42))]
     VariantB,
@@ -269,8 +215,8 @@ pub enum Enum {
     VariantC { c: VariantC },
     #[enumcapsulate(discriminant(name = RenamedVariant, nested))]
     VariantD(VariantD),
-    #[enumcapsulate(field = 1, discriminant(nested))]
-    VariantE(bool, VariantE),
+    #[enumcapsulate(field = 1, discriminant(nested = VariantEDiscriminant))]
+    VariantE(bool, VariantE<T>),
 }
 #[repr(u8)]
 pub enum EnumDiscriminant {
@@ -278,7 +224,7 @@ pub enum EnumDiscriminant {
     VariantB = 42,
     VariantC(<VariantC as ::enumcapsulate::VariantDiscriminant>::Discriminant),
     RenamedVariant(<VariantD as ::enumcapsulate::VariantDiscriminant>::Discriminant),
-    VariantE(<VariantE as ::enumcapsulate::VariantDiscriminant>::Discriminant),
+    VariantE(VariantEDiscriminant),
 }
 #[automatically_derived]
 impl ::core::marker::Copy for EnumDiscriminant {}
@@ -292,9 +238,7 @@ impl ::core::clone::Clone for EnumDiscriminant {
         let _: ::core::clone::AssertParamIsClone<
             <VariantD as ::enumcapsulate::VariantDiscriminant>::Discriminant,
         >;
-        let _: ::core::clone::AssertParamIsClone<
-            <VariantE as ::enumcapsulate::VariantDiscriminant>::Discriminant,
-        >;
+        let _: ::core::clone::AssertParamIsClone<VariantEDiscriminant>;
         *self
     }
 }
@@ -364,9 +308,7 @@ impl ::core::cmp::Eq for EnumDiscriminant {
         let _: ::core::cmp::AssertParamIsEq<
             <VariantD as ::enumcapsulate::VariantDiscriminant>::Discriminant,
         >;
-        let _: ::core::cmp::AssertParamIsEq<
-            <VariantE as ::enumcapsulate::VariantDiscriminant>::Discriminant,
-        >;
+        let _: ::core::cmp::AssertParamIsEq<VariantEDiscriminant>;
     }
 }
 #[automatically_derived]
@@ -450,7 +392,7 @@ impl ::core::fmt::Debug for EnumDiscriminant {
         }
     }
 }
-impl ::enumcapsulate::VariantDiscriminant for Enum {
+impl<T> ::enumcapsulate::VariantDiscriminant for Enum<T> {
     type Discriminant = EnumDiscriminant;
     fn variant_discriminant(&self) -> Self::Discriminant {
         match self {

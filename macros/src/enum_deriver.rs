@@ -1,6 +1,8 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{parse_quote, parse_quote_spanned, visit::Visit as _, Fields, Type, Variant};
+use syn::{
+    parse_quote, parse_quote_spanned, spanned::Spanned, visit::Visit as _, Fields, Type, Variant,
+};
 
 use crate::*;
 
@@ -579,13 +581,28 @@ impl EnumDeriver {
                     discriminant_variant_expr = Some(expr);
                 }
 
-                if discriminant_config.nested() {
-                    let (field, _) = field_selection.expect("no selected field found");
-                    let ty = &field.ty;
-                    let nested_type = parse_quote! {
-                        <#ty as ::enumcapsulate::VariantDiscriminant>::Discriminant
-                    };
-                    discriminant_variant_nested = Some(nested_type);
+                if let Some(nested) = discriminant_config.nested() {
+                    match nested {
+                        NestedDiscriminantType::Default => {
+                            let (field, _) = field_selection.expect("no selected field found");
+                            let field_type = &field.ty;
+
+                            if self.uses_generic_const_or_type(field_type) {
+                                return Err(syn::Error::new(
+                                    field.span(),
+                                    "generic fields require an explicit nested discriminant type",
+                                ));
+                            }
+
+                            let nested_type = parse_quote! {
+                                <#field_type as ::enumcapsulate::VariantDiscriminant>::Discriminant
+                            };
+                            discriminant_variant_nested = Some(nested_type);
+                        }
+                        NestedDiscriminantType::Custom(custom_type) => {
+                            discriminant_variant_nested = Some(custom_type.clone());
+                        }
+                    }
                 }
             }
 
