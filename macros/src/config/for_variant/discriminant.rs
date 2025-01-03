@@ -2,11 +2,17 @@ use syn::meta::ParseNestedMeta;
 
 use crate::attr::{NAME, NESTED, VALUE};
 
+#[derive(Clone)]
+pub enum NestedDiscriminantType {
+    Default,
+    Custom(syn::Type),
+}
+
 #[derive(Clone, Default)]
 pub(crate) struct DiscriminantConfig {
     value: Option<syn::Expr>,
     name: Option<syn::Ident>,
-    nested: bool,
+    nested: Option<NestedDiscriminantType>,
 }
 
 impl DiscriminantConfig {
@@ -19,7 +25,7 @@ impl DiscriminantConfig {
             if meta.path.is_ident(VALUE) {
                 if self.value.is_some() {
                     return Err(meta.error("`value = …` already specified"));
-                } else if self.nested {
+                } else if self.nested.is_some() {
                     return Err(meta.error("conflicting with use of `nesting`"));
                 }
 
@@ -33,13 +39,18 @@ impl DiscriminantConfig {
             } else if meta.path.is_ident(NESTED) {
                 if matches!(variant.fields, syn::Fields::Unit) {
                     return Err(meta.error("no field found on variant"));
-                } else if self.nested {
+                } else if self.nested.is_some() {
                     return Err(meta.error("`nested` already specified"));
                 } else if self.value.is_some() {
                     return Err(meta.error("conflicting with use of `value = …`"));
                 }
 
-                self.nested = true;
+                if meta.input.peek(syn::Token![=]) {
+                    let custom_type = meta.value()?.parse()?;
+                    self.nested = Some(NestedDiscriminantType::Custom(custom_type));
+                } else {
+                    self.nested = Some(NestedDiscriminantType::Default);
+                }
             } else {
                 return Err(meta.error("unsupported discriminant attribute"));
             }
@@ -56,7 +67,7 @@ impl DiscriminantConfig {
         self.name.as_ref()
     }
 
-    pub(crate) fn nested(&self) -> bool {
-        self.nested
+    pub(crate) fn nested(&self) -> Option<&NestedDiscriminantType> {
+        self.nested.as_ref()
     }
 }

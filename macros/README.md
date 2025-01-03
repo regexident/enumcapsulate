@@ -310,6 +310,37 @@ enum Enum {
 
 There is limited support for generic enums:
 
+### `VariantDiscriminant`
+
+When using the `VariantDiscriminant` derive macro with a generic enum you have to
+provide an explicit type path for any nested discriminant that uses any of the parent
+enum's generic parameters in its own type.
+
+```rust
+#[derive(VariantDiscriminant)]
+enum VariantA<T> {
+    VariantA1(T),
+    // ...
+}
+
+#[derive(VariantDiscriminant)]
+enum VariantB {
+    VariantB1,
+    // ...
+}
+
+#[derive(VariantDiscriminant)]
+enum Enum<T> {
+    #[enumcapsulate(discriminant(nested = VariantADiscriminant))]
+    VariantA(VariantA<T>),
+    #[enumcapsulate(discriminant(nested))]
+    VariantB(VariantB),
+    // ...
+}
+```
+
+### Generic traits
+
 Variants using generic const/type parameters are always excluded when deriving generic traits with `enumcapsulate`'s derive macros.
 
 The reason for this behavior is that implementing generic traits for variants that use any of the generic parameters of the enum tends to result in conflicting implementations in Rust, as shown by the following example program:
