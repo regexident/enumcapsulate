@@ -20,7 +20,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Added
 
-- Made `VariantDiscriminant` derive macro support variants with non-`'static` lifetimes.
+- n/a
 
 ### Changed
 
@@ -49,6 +49,12 @@ Please make sure to add your changes to the appropriate categories:
 ### Other
 
 - n/a
+
+## [0.6.3] - 2025-05-22
+
+### Added
+
+- Added support for variants with non-`'static` lifetimes for the `VariantDiscriminant` derive macro.
 
 ## [0.6.2] - 2025-01-03
 
