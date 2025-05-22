@@ -1,10 +1,11 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{
-    parse_quote, parse_quote_spanned, spanned::Spanned, visit::Visit as _, Fields, Type, Variant,
+    parse_quote, parse_quote_spanned, spanned::Spanned, visit::Visit as _, visit_mut::VisitMut,
+    Fields, Type, Variant,
 };
 
-use crate::*;
+use crate::{type_visitor_mut::TypeVisitorMut, *};
 
 pub(crate) struct EnumDeriver {
     item: syn::ItemEnum,
@@ -585,14 +586,22 @@ impl EnumDeriver {
                     match nested {
                         NestedDiscriminantType::Default => {
                             let (field, _) = field_selection.expect("no selected field found");
-                            let field_type = &field.ty;
 
-                            if self.uses_generic_const_or_type(field_type) {
+                            let mut visitor = TypeVisitor::new(&self.item.generics);
+                            visitor.visit_type(&field.ty);
+
+                            if visitor.type_uses_const_or_type_param() {
                                 return Err(syn::Error::new(
                                     field.span(),
                                     "generic fields require an explicit nested discriminant type",
                                 ));
                             }
+
+                            let field_type = if visitor.type_uses_lifetime_param() {
+                                self.type_replacing_lifetimes_with_static(&field.ty)
+                            } else {
+                                field.ty.clone()
+                            };
 
                             let nested_type = parse_quote! {
                                 <#field_type as ::enumcapsulate::VariantDiscriminant>::Discriminant
@@ -741,11 +750,18 @@ impl EnumDeriver {
         }
     }
 
+    fn type_replacing_lifetimes_with_static(&self, ty: &syn::Type) -> syn::Type {
+        let mut ty = ty.clone();
+        let mut visitor = TypeVisitorMut::default().replace_lifetimes_with_static();
+        visitor.visit_type_mut(&mut ty);
+        ty
+    }
+
     fn uses_generic_const_or_type(&self, ty: &syn::Type) -> bool {
         let mut visitor = TypeVisitor::new(&self.item.generics);
 
         visitor.visit_type(ty);
 
-        visitor.uses_const_or_type_param()
+        visitor.type_uses_const_or_type_param()
     }
 }

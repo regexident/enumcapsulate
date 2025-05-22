@@ -6,6 +6,7 @@ use crate::utils::tokenstream;
 mod config;
 mod enum_deriver;
 mod type_visitor;
+mod type_visitor_mut;
 mod utils;
 
 use self::{config::*, enum_deriver::*, type_visitor::*, utils::*};
