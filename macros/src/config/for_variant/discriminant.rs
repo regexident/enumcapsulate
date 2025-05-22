@@ -5,7 +5,7 @@ use crate::attr::{NAME, NESTED, VALUE};
 #[derive(Clone)]
 pub enum NestedDiscriminantType {
     Default,
-    Custom(syn::Type),
+    Custom(Box<syn::Type>),
 }
 
 #[derive(Clone, Default)]

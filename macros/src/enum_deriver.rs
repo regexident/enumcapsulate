@@ -600,7 +600,7 @@ impl EnumDeriver {
                             discriminant_variant_nested = Some(nested_type);
                         }
                         NestedDiscriminantType::Custom(custom_type) => {
-                            discriminant_variant_nested = Some(custom_type.clone());
+                            discriminant_variant_nested = Some((**custom_type).clone());
                         }
                     }
                 }
