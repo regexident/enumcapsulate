@@ -1,16 +1,18 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "packageRules": [
-    {
-      "allowedVersions": "!/^=/",
-      "groupName": "dependencies",
-      "groupSlug": "dependencies",
-      "matchPackageNames": [
-        "*"
-      ]
-    }
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended"],
+    "packageRules": [
+        {
+            "extends": ["schedule:automergeMonthly"],
+            "groupName": "cargo-binstall",
+            "groupSlug": "cargo-binstall",
+            "matchPackageNames": ["cargo-binstall"]
+        },
+        {
+            "allowedVersions": "!/^=/",
+            "groupName": "dependencies",
+            "groupSlug": "dependencies",
+            "matchPackageNames": ["*"]
+        }
+    ]
 }
