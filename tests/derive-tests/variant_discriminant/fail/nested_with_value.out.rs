@@ -20,9 +20,9 @@ impl ::core::clone::Clone for VariantADiscriminant {
 impl ::core::cmp::Ord for VariantADiscriminant {
     #[inline]
     fn cmp(&self, other: &VariantADiscriminant) -> ::core::cmp::Ordering {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::Ord::cmp(&__self_tag, &__arg1_tag)
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+        ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr)
     }
 }
 #[automatically_derived]
@@ -32,9 +32,9 @@ impl ::core::cmp::PartialOrd for VariantADiscriminant {
         &self,
         other: &VariantADiscriminant,
     ) -> ::core::option::Option<::core::cmp::Ordering> {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        ::core::cmp::PartialOrd::partial_cmp(&__self_tag, &__arg1_tag)
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+        ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
     }
 }
 #[automatically_derived]
@@ -50,17 +50,17 @@ impl ::core::marker::StructuralPartialEq for VariantADiscriminant {}
 impl ::core::cmp::PartialEq for VariantADiscriminant {
     #[inline]
     fn eq(&self, other: &VariantADiscriminant) -> bool {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        __self_tag == __arg1_tag
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+        __self_discr == __arg1_discr
     }
 }
 #[automatically_derived]
 impl ::core::hash::Hash for VariantADiscriminant {
     #[inline]
     fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        ::core::hash::Hash::hash(&__self_tag, state)
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        ::core::hash::Hash::hash(&__self_discr, state)
     }
 }
 #[automatically_derived]

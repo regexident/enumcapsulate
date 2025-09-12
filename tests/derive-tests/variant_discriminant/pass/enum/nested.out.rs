@@ -246,9 +246,9 @@ impl ::core::clone::Clone for EnumDiscriminant {
 impl ::core::cmp::Ord for EnumDiscriminant {
     #[inline]
     fn cmp(&self, other: &EnumDiscriminant) -> ::core::cmp::Ordering {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        match ::core::cmp::Ord::cmp(&__self_tag, &__arg1_tag) {
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+        match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
             ::core::cmp::Ordering::Equal => {
                 match (self, other) {
                     (
@@ -277,8 +277,8 @@ impl ::core::cmp::PartialOrd for EnumDiscriminant {
         &self,
         other: &EnumDiscriminant,
     ) -> ::core::option::Option<::core::cmp::Ordering> {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        let __arg1_discr = ::core::intrinsics::discriminant_value(other);
         match (self, other) {
             (
                 EnumDiscriminant::VariantC(__self_0),
@@ -292,7 +292,7 @@ impl ::core::cmp::PartialOrd for EnumDiscriminant {
                 EnumDiscriminant::VariantE(__self_0),
                 EnumDiscriminant::VariantE(__arg1_0),
             ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
-            _ => ::core::cmp::PartialOrd::partial_cmp(&__self_tag, &__arg1_tag),
+            _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
         }
     }
 }
@@ -317,22 +317,22 @@ impl ::core::marker::StructuralPartialEq for EnumDiscriminant {}
 impl ::core::cmp::PartialEq for EnumDiscriminant {
     #[inline]
     fn eq(&self, other: &EnumDiscriminant) -> bool {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        let __arg1_tag = ::core::intrinsics::discriminant_value(other);
-        __self_tag == __arg1_tag
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+        __self_discr == __arg1_discr
             && match (self, other) {
                 (
                     EnumDiscriminant::VariantC(__self_0),
                     EnumDiscriminant::VariantC(__arg1_0),
-                ) => *__self_0 == *__arg1_0,
+                ) => __self_0 == __arg1_0,
                 (
                     EnumDiscriminant::RenamedVariant(__self_0),
                     EnumDiscriminant::RenamedVariant(__arg1_0),
-                ) => *__self_0 == *__arg1_0,
+                ) => __self_0 == __arg1_0,
                 (
                     EnumDiscriminant::VariantE(__self_0),
                     EnumDiscriminant::VariantE(__arg1_0),
-                ) => *__self_0 == *__arg1_0,
+                ) => __self_0 == __arg1_0,
                 _ => true,
             }
     }
@@ -341,8 +341,8 @@ impl ::core::cmp::PartialEq for EnumDiscriminant {
 impl ::core::hash::Hash for EnumDiscriminant {
     #[inline]
     fn hash<__H: ::core::hash::Hasher>(&self, state: &mut __H) -> () {
-        let __self_tag = ::core::intrinsics::discriminant_value(self);
-        ::core::hash::Hash::hash(&__self_tag, state);
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        ::core::hash::Hash::hash(&__self_discr, state);
         match self {
             EnumDiscriminant::VariantC(__self_0) => {
                 ::core::hash::Hash::hash(__self_0, state)

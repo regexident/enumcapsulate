@@ -143,7 +143,7 @@ impl ::core::cmp::PartialEq for EnumWithLifetimeDiscriminant {
             (
                 EnumWithLifetimeDiscriminant::VariantA(__self_0),
                 EnumWithLifetimeDiscriminant::VariantA(__arg1_0),
-            ) => *__self_0 == *__arg1_0,
+            ) => __self_0 == __arg1_0,
         }
     }
 }
