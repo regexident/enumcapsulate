@@ -43,7 +43,7 @@ jobs:
           # update `cargo-expand` accordingly, when bumping MSRV:
           toolchain: 1.86.0
           components: rust-src
-      - uses: cargo-bins/cargo-binstall@v1.15.4
+      - uses: cargo-bins/cargo-binstall@v1.15.5
       - run: cargo binstall cargo-expand@1.0.95 --no-confirm
       - run: cargo test -- --test-threads=1
 
