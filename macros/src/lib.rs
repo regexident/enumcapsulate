@@ -396,7 +396,9 @@ pub fn derive_variant_discriminant(input: TokenStream) -> TokenStream {
 /// then you can do so by use of an `#[enumcapsulate(exclude(…))]` attribute
 /// on the enum itself, such as if you wanted to exclude `From` and `TryInto`:
 ///
-/// ```rust
+/// ```ignore
+/// use enumcapsulate::Encapsulate;
+///
 /// #[derive(Encapsulate)]
 /// #[enumcapsulate(exclude(From, TryInto))]
 /// enum Enum {
