@@ -24,7 +24,8 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- n/a
+- Updated dependencies:
+  - `syn` from `2.0.60` to `3.0.0`
 
 ### Deprecated
 
