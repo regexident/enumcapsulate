@@ -24,8 +24,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Changed
 
-- Updated dependencies:
-  - `syn` from `2.0.60` to `3.0.0`
+- n/a
 
 ### Deprecated
 
@@ -37,7 +36,7 @@ Please make sure to add your changes to the appropriate categories:
 
 ### Fixed
 
-- n/A
+- n/a
 
 ### Performance
 
@@ -50,6 +49,13 @@ Please make sure to add your changes to the appropriate categories:
 ### Other
 
 - n/a
+
+## [0.6.4] - 2026-08-02
+
+### Changed
+
+- Updated dependencies:
+  - `syn` from `2.0.60` to `3.0.0`
 
 ## [0.6.3] - 2025-05-22
 
